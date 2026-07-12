@@ -26,3 +26,7 @@ frontend/dist/
 frontend/*.tsbuildinfo
 frontend/vite.config.d.ts
 frontend/vite.config.js
+
+# Synced frontend build output embedded into the Go binary
+backend/internal/frontend/dist/*
+!backend/internal/frontend/dist/.gitkeep

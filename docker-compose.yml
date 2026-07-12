@@ -1,0 +1,34 @@
+services:
+  postgres:
+    image: postgres:16-alpine
+    restart: unless-stopped
+    environment:
+      POSTGRES_USER: babytrack
+      POSTGRES_PASSWORD: babytrack
+      POSTGRES_DB: babytrack
+    ports:
+      - "5432:5432"
+    volumes:
+      - pgdata:/var/lib/postgresql/data
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U babytrack"]
+      interval: 5s
+      timeout: 3s
+      retries: 10
+
+  app:
+    build: .
+    restart: unless-stopped
+    environment:
+      PORT: "8080"
+      ENV: "production"
+      DB_URL: "postgres://babytrack:babytrack@postgres:5432/babytrack?sslmode=disable"
+      JWT_SECRET: "change-me-to-a-long-random-secret"
+    ports:
+      - "8080:8080"
+    depends_on:
+      postgres:
+        condition: service_healthy
+
+volumes:
+  pgdata:

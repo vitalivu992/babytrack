@@ -16,6 +16,7 @@ import (
 	"github.com/gin-gonic/gin"
 
 	"github.com/vitalivu992/babytrack/internal/config"
+	"github.com/vitalivu992/babytrack/internal/frontend"
 	"github.com/vitalivu992/babytrack/internal/handlers"
 	"github.com/vitalivu992/babytrack/internal/middleware"
 	"github.com/vitalivu992/babytrack/internal/migrations"
@@ -159,6 +160,14 @@ func run() error {
 				owner.DELETE("/members/:user_id", shareH.Revoke)
 			}
 		}
+	}
+
+	// --- embedded frontend SPA (served for any non-API, non-health route) ---
+	spaHandler, err := frontend.Handler()
+	if err != nil {
+		log.Printf("warning: frontend not embedded (%v) — serving API only", err)
+	} else {
+		r.NoRoute(spaHandler)
 	}
 
 	srv := &http.Server{
