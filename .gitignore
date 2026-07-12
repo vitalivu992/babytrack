@@ -1,0 +1,25 @@
+# Go
+backend/build/
+*.exe
+*.exe~
+*.dll
+*.so
+*.dylib
+*.test
+*.out
+vendor/
+
+# Env
+.env
+.env.local
+*.env.local
+
+# Editor / OS
+.idea/
+.vscode/
+.DS_Store
+*.swp
+
+# Frontend (later phases)
+frontend/node_modules/
+frontend/dist/
