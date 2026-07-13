@@ -2,7 +2,7 @@ import { Link } from "react-router-dom";
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import { useTranslation } from "react-i18next";
 import { createLog } from "../api/activities";
-import { dailySummary } from "../api/insights";
+import { dailySummary, dayStr } from "../api/insights";
 import { listLogs } from "../api/activities";
 import { errorMessage } from "../api/client";
 import i18n from "../i18n";
@@ -70,7 +70,7 @@ export default function Dashboard() {
   const qc = useQueryClient();
 
   const childId = activeChild?.id ?? "";
-  const today = new Date().toISOString().slice(0, 10);
+  const today = dayStr(new Date());
 
   const { data: summary } = useQuery({
     queryKey: ["daily", childId, today],

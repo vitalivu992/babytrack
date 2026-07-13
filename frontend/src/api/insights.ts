@@ -10,7 +10,11 @@ import type {
 const DAY = "YYYY-MM-DD";
 
 function dayStr(d: Date): string {
-  return d.toISOString().slice(0, 10);
+  // Use local date components, not UTC, so the day boundary matches the user's timezone
+  const y = d.getFullYear();
+  const m = String(d.getMonth() + 1).padStart(2, "0");
+  const day = String(d.getDate()).padStart(2, "0");
+  return `${y}-${m}-${day}`;
 }
 
 /** GET /api/children/:id/insights/daily?date=YYYY-MM-DD */
