@@ -25,10 +25,12 @@ COPY --from=frontend /app/frontend/dist ./backend/internal/frontend/dist
 RUN cd backend && go build -trimpath -ldflags="-s -w" -o /out/babytrack ./cmd/server
 
 # ---- Stage 3: minimal runtime image ----
-FROM gcr.io/distroless/static-debian12:nonroot AS runtime
+FROM alpine:3.20 AS runtime
+RUN apk add --no-cache wget ca-certificates tzdata && \
+    adduser -D -u 65532 app
 ENV PORT=8080 ENV=production
 WORKDIR /
 COPY --from=backend /out/babytrack /babytrack
 EXPOSE 8080
-USER nonroot:nonroot
+USER app
 ENTRYPOINT ["/babytrack"]
