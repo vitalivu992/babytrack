@@ -1,0 +1,422 @@
+{
+  "common": {
+    "save": "Lưu",
+    "cancel": "Hủy",
+    "delete": "Xóa",
+    "remove": "Xóa",
+    "edit": "Sửa",
+    "close": "Đóng",
+    "dismiss": "Bỏ qua",
+    "retry": "Thử lại",
+    "reset": "Đặt lại",
+    "loading": "Đang tải…",
+    "today": "Hôm nay",
+    "yesterday": "Hôm qua",
+    "seeAll": "Xem tất cả",
+    "goHome": "Về trang chủ",
+    "back": "Quay lại"
+  },
+  "app": {
+    "brand": "BabyTrack",
+    "quickLog": "Ghi nhanh",
+    "switchChild": "Đổi em bé trong cài đặt",
+    "madeWith": "BabyTrack · làm với 💜"
+  },
+  "nav": {
+    "home": "Trang chủ",
+    "logs": "Nhật ký",
+    "child": "Em bé",
+    "insights": "Thống kê",
+    "share": "Chia sẻ",
+    "settings": "Cài đặt",
+    "signOut": "Đăng xuất"
+  },
+  "auth": {
+    "login": {
+      "title": "Chào mừng trở lại",
+      "subtitle": "Đăng nhập để tiếp tục theo dõi bé nhé.",
+      "email": "Email",
+      "emailPlaceholder": "ban@example.com",
+      "password": "Mật khẩu",
+      "passwordPlaceholder": "••••••••",
+      "submit": "Đăng nhập",
+      "newHere": "Lần đầu tới?",
+      "createAccount": "Tạo tài khoản",
+      "welcomeBack": "Chào mừng trở lại, {{name}}!",
+      "friend": "bạn",
+      "couldNotSignIn": "Không thể đăng nhập"
+    },
+    "register": {
+      "title": "Tạo tài khoản của bạn",
+      "subtitle": "Bắt đầu ghi lại ngày của bé chỉ trong chốc lát.",
+      "name": "Tên của bạn",
+      "namePlaceholder": "Nguyễn Văn A",
+      "email": "Email",
+      "emailPlaceholder": "ban@example.com",
+      "password": "Mật khẩu",
+      "passwordPlaceholder": "Ít nhất 6 ký tự",
+      "confirm": "Nhập lại mật khẩu",
+      "confirmPlaceholder": "Nhập lại mật khẩu",
+      "submit": "Tạo tài khoản",
+      "alreadyHaveAccount": "Đã có tài khoản?",
+      "signIn": "Đăng nhập",
+      "passwordTooShort": "Mật khẩu phải có ít nhất 6 ký tự.",
+      "passwordsDoNotMatch": "Mật khẩu không khớp.",
+      "accountCreated": "Đã tạo tài khoản!",
+      "letsAddChild": "Hãy thêm bé đầu tiên của bạn.",
+      "couldNotCreate": "Không thể tạo tài khoản"
+    }
+  },
+  "onboarding": {
+    "title": "Thêm bé đầu tiên",
+    "subtitle": "Vài thông tin nhỏ để cá nhân hóa BabyTrack.",
+    "submit": "Thêm bé",
+    "childAdded": "Đã thêm bé!",
+    "letsStartTracking": "Bắt đầu ghi nhận thôi.",
+    "couldNotAdd": "Không thể thêm bé"
+  },
+  "invite": {
+    "invalid": "Đường dẫn lời mời này không hợp lệ.",
+    "invited": "Bạn được mời!",
+    "prompt": "Đăng nhập hoặc tạo tài khoản để chấp nhận lời mời.",
+    "signIn": "Đăng nhập",
+    "createAccount": "Tạo tài khoản",
+    "accepting": "Đang chấp nhận lời mời…",
+    "accepted": "Đã chấp nhận lời mời!",
+    "canNowTrack": "Giờ bạn có thể theo dõi {{name}}.",
+    "couldNotAccept": "Không thể chấp nhận"
+  },
+  "dashboard": {
+    "greeting": {
+      "morning": "Chào buổi sáng",
+      "afternoon": "Chào buổi chiều",
+      "evening": "Chào buổi tối",
+      "there": "bạn"
+    },
+    "log": "Ghi lại",
+    "today": "Hôm nay",
+    "quickLog": "Ghi nhanh",
+    "recent": "Gần đây",
+    "logActivity": "Ghi hoạt động",
+    "empty": "Chưa có hoạt động nào. Chọn một nút ghi nhanh ở trên để bắt đầu! 🌟",
+    "summary": {
+      "feedings": "Bữa ăn",
+      "diapers": "Tã",
+      "changes": "lần thay",
+      "sleep": "Giấc ngủ",
+      "sessions": "{{count}} giấc"
+    },
+    "presets": {
+      "fed120": "Ăn 120ml",
+      "pooppee": "Tiểu + Đại",
+      "nap1h": "Ngủ ngắn (1h)"
+    },
+    "toast": {
+      "logged": "Đã ghi!",
+      "feedingLogged": "Đã ghi {{subtype}}",
+      "diaperLogged": "Đã ghi thay tã",
+      "sleepLogged": "Đã ghi giấc ngủ",
+      "couldNotSave": "Không thể lưu"
+    }
+  },
+  "logs": {
+    "types": {
+      "feeding": "Cho ăn",
+      "diaper": "Tã",
+      "sleep": "Ngủ",
+      "measurement": "Đo lường",
+      "medicine": "Thuốc",
+      "other": "Khác"
+    },
+    "describe": {
+      "feeding": "Cho ăn",
+      "diaperChange": "Thay tã",
+      "started": "Đã bắt đầu",
+      "measurement": "Đo lường",
+      "medicine": "Thuốc",
+      "activity": "Hoạt động"
+    },
+    "subtypes": {
+      "breast": "Bú mẹ",
+      "formula": "Sữa công thức",
+      "solid": "Ăn dặm",
+      "pumping": "Hút sữa",
+      "nap": "Ngủ ngắn",
+      "night": "Ngủ đêm"
+    },
+    "contents": {
+      "pee": "Tiểu",
+      "poop": "Đại",
+      "both": "Tiểu + Đại"
+    },
+    "measureTypes": {
+      "weight": "Cân nặng",
+      "height": "Chiều cao",
+      "head_circumference": "Vòng đầu"
+    },
+    "add": {
+      "title": "Ghi hoạt động",
+      "tabs": {
+        "feed": "Ăn",
+        "diaper": "Tã",
+        "sleep": "Ngủ",
+        "measure": "Đo",
+        "medicine": "Thuốc",
+        "other": "Khác"
+      },
+      "reset": "Đặt lại",
+      "saveLog": "Lưu bản ghi",
+      "time": "Thời gian",
+      "note": "Ghi chú (không bắt buộc)",
+      "notePlaceholder": "Điều gì cần nhớ...",
+      "feeding": {
+        "type": "Loại",
+        "typePlaceholder": "Chọn loại cho ăn",
+        "side": "Bên",
+        "select": "Chọn",
+        "left": "Trái",
+        "right": "Phải",
+        "both": "Cả hai",
+        "duration": "Thời lượng (phút)",
+        "amount": "Lượng (ml)",
+        "food": "Mô tả thức ăn",
+        "foodPlaceholder": "vd: chuối nghiền"
+      },
+      "diaper": {
+        "contents": "Chứa",
+        "consistency": "Độ đặc (thang phân Bristol)",
+        "bristol": "Bristol {{n}}",
+        "color": "Màu (không bắt buộc)",
+        "colorPlaceholder": "vd: vàng, nâu"
+      },
+      "sleep": {
+        "type": "Loại",
+        "hint": "💡 Đặt thời lượng nhanh, hoặc chọn giờ bắt đầu & kết thúc bên dưới.",
+        "duration": "Thời lượng (phút)",
+        "durationPlaceholder": "vd: 45",
+        "start": "Bắt đầu",
+        "end": "Kết thúc"
+      },
+      "measurement": {
+        "measurement": "Đo lường",
+        "select": "Chọn",
+        "value": "Giá trị",
+        "unit": "Đơn vị",
+        "hint": "Điều này cũng tạo một điểm dữ liệu tăng trưởng mà bạn có thể xem ở trang Em bé."
+      },
+      "medicine": {
+        "name": "Tên thuốc",
+        "namePlaceholder": "vd: Paracetamol",
+        "dose": "Liều dùng",
+        "dosePlaceholder": "vd: 2.5 ml"
+      },
+      "other": {
+        "activity": "Hoạt động",
+        "select": "Chọn",
+        "tummyTime": "Tummy time",
+        "bath": "Tắm",
+        "milestone": "Cột mốc",
+        "doctorVisit": "Khám bác sĩ",
+        "play": "Chơi",
+        "mood": "Tâm trạng"
+      }
+    },
+    "history": {
+      "title": "Lịch sử hoạt động",
+      "subtitle": "Tất cả bản ghi của {{name}}.",
+      "filterByType": "Lọc theo loại",
+      "timeRange": "Khoảng thời gian",
+      "allActivities": "Tất cả hoạt động",
+      "last7": "7 ngày qua",
+      "last30": "30 ngày qua",
+      "last90": "90 ngày qua",
+      "noMatch": "Không có bản ghi nào khớp.",
+      "deleteTitle": "Xóa bản ghi?",
+      "cannotUndo": "Hành động này không thể hoàn tác.",
+      "deletedToast": "Đã xóa bản ghi",
+      "couldNotDelete": "Không thể xóa"
+    }
+  },
+  "child": {
+    "profile": {
+      "noBirthDate": "Chưa đặt ngày sinh",
+      "allergies": "Dị ứng",
+      "notes": "Ghi chú",
+      "editChild": "Sửa {{name}}",
+      "saveChanges": "Lưu thay đổi",
+      "profileUpdated": "Đã cập nhật hồ sơ",
+      "couldNotUpdate": "Không thể cập nhật",
+      "tabs": {
+        "growth": "Tăng trưởng",
+        "vaccines": "Tiêm chủng",
+        "share": "Chia sẻ"
+      },
+      "shareCta": "Mời người nhà hoặc người chăm sóc cùng theo dõi {{name}}.",
+      "manageSharing": "Quản lý chia sẻ"
+    },
+    "form": {
+      "name": "Tên bé",
+      "namePlaceholder": "Tên bé",
+      "birthDate": "Ngày sinh",
+      "gender": "Giới tính",
+      "select": "Chọn",
+      "female": "Nữ",
+      "male": "Nam",
+      "otherGender": "Khác / Không muốn nói",
+      "photoUrl": "URL ảnh (không bắt buộc)",
+      "photoPlaceholder": "https://...",
+      "photoHint": "Dán đường dẫn tới ảnh của bé.",
+      "bloodType": "Nhóm máu (không bắt buộc)",
+      "unknown": "Không rõ",
+      "allergies": "Dị ứng (không bắt buộc)",
+      "allergiesPlaceholder": "vd: đậu phộng",
+      "notes": "Ghi chú (không bắt buộc)",
+      "notesPlaceholder": "Điều gì đáng nhớ..."
+    }
+  },
+  "insights": {
+    "title": "Thống kê",
+    "subtitle": "Xu hướng & quy luật của {{name}}.",
+    "thisWeek": "Tuần này",
+    "feedings": "bữa ăn",
+    "diapers": "tã",
+    "sleep": "ngủ",
+    "ranges": {
+      "7": "7 ngày",
+      "14": "14 ngày",
+      "30": "30 ngày"
+    },
+    "avgFeedings": "TB bữa ăn/ngày",
+    "mlTotal": "{{n}} ml tổng",
+    "avgSleep": "TB ngủ/ngày",
+    "sessions": "{{count}} giấc",
+    "tabs": {
+      "weekly": "Hàng tuần",
+      "feeding": "Cho ăn",
+      "sleep": "Ngủ"
+    },
+    "feedingsDiapers": "Số bữa ăn & tã mỗi ngày",
+    "sleepHours": "Giờ ngủ mỗi ngày",
+    "series": {
+      "feedings": "Bữa ăn",
+      "diapers": "Tã",
+      "hours": "Giờ"
+    },
+    "feedingBreakdown": "Phân tích cho ăn",
+    "noFeedingData": "Chưa có dữ liệu cho ăn trong khoảng này.",
+    "total": "Tổng cộng",
+    "totalVolume": "Tổng thể tích",
+    "sleepSummary": "Tổng hợp giấc ngủ",
+    "totalSleep": "Tổng giờ ngủ",
+    "avgPerDay": "TB / ngày"
+  },
+  "growth": {
+    "weight": "Cân nặng (kg)",
+    "height": "Chiều dài (cm)",
+    "head": "Vòng đầu (cm)",
+    "latest": "Mới nhất: {{value}}",
+    "empty": "Chưa có số đo {{kind}} nào. Hãy ghi từ tab Đo lường.",
+    "age": "Tuổi: {{n}} tháng",
+    "yourChild": "Bé của bạn",
+    "who50": "WHO 50",
+    "band": "Vạch 3–97"
+  },
+  "vaccination": {
+    "loading": "Đang tải lịch tiêm…",
+    "empty": "Chưa có lịch tiêm chủng.",
+    "tapBelow": "Chạm bên dưới để tạo lịch theo WHO.",
+    "addDob": "Thêm ngày sinh để tạo lịch tiêm.",
+    "progress": "Tiến độ tiêm chủng",
+    "doses": "Đã ghi {{given}}/{{total}} mũi",
+    "record": "Ghi mũi tiêm",
+    "scheduledFor": "Dự kiến vào {{date}}.",
+    "dateGiven": "Ngày tiêm",
+    "lot": "Số lô (không bắt buộc)",
+    "lotPlaceholder": "vd: AB1234",
+    "given": "Đã tiêm {{date}}",
+    "due": "Hẹn {{date}}",
+    "overdue": "quá hạn",
+    "dueSoon": "sắp đến hạn",
+    "markGiven": "Đánh dấu đã tiêm",
+    "recordedToast": "Đã ghi mũi tiêm!",
+    "couldNotRecord": "Không thể ghi",
+    "couldNotGenerate": "Không thể tạo lịch"
+  },
+  "share": {
+    "title": "Chia sẻ {{name}}",
+    "subtitle": "Mời người nhà và người chăm sóc. Chủ sở hữu có thể sửa mọi thứ; người chỉnh sửa có thể ghi hoạt động; người xem chỉ có thể xem.",
+    "inviteSomeone": "Mời người",
+    "email": "Địa chỉ email",
+    "emailPlaceholder": "chamsoc@example.com",
+    "role": "Vai trò",
+    "roleEditor": "Người chỉnh sửa — có thể ghi hoạt động",
+    "roleViewer": "Người xem — chỉ xem",
+    "send": "Gửi lời mời",
+    "shareLink": "Đường dẫn chia sẻ",
+    "linkHelp": "Gửi đường dẫn này cho người được mời. Họ sẽ được yêu cầu đăng nhập hoặc tạo tài khoản với {{email}}.",
+    "onlyOwner": "Chỉ chủ sở hữu mới có thể gửi lời mời. Bạn là {{role}} của bé này.",
+    "members": "Thành viên ({{count}})",
+    "joined": "tham gia {{date}}",
+    "noMembers": "Chưa có thành viên nào.",
+    "removeMember": "Xóa thành viên",
+    "removeTitle": "Xóa quyền truy cập?",
+    "removeConfirm": "Người này sẽ mất quyền truy cập dữ liệu của {{name}} ngay lập tức.",
+    "roles": {
+      "owner": "chủ sở hữu",
+      "editor": "người chỉnh sửa",
+      "viewer": "người xem"
+    },
+    "toast": {
+      "sent": "Đã gửi lời mời!",
+      "sentTo": "Đã gửi tới {{email}}",
+      "couldNotInvite": "Không thể mời",
+      "removed": "Đã xóa quyền truy cập",
+      "couldNotRemove": "Không thể xóa"
+    }
+  },
+  "settings": {
+    "title": "Cài đặt",
+    "myChildren": "Các bé của tôi",
+    "addAnother": "Thêm bé khác",
+    "activeChild": "Bé đang chọn",
+    "editProfile": "Sửa hồ sơ & tăng trưởng",
+    "manageSharing": "Quản lý chia sẻ",
+    "account": "Tài khoản",
+    "name": "Tên",
+    "email": "Email",
+    "appearance": {
+      "title": "Giao diện",
+      "subtitle": "Tùy chỉnh cách BabyTrack hiển thị trên thiết bị này.",
+      "theme": "Chủ đề",
+      "language": "Ngôn ngữ",
+      "light": "Sáng",
+      "dark": "Tối",
+      "system": "Hệ thống",
+      "lightDesc": "Sáng sủa và tươi vui",
+      "darkDesc": "Dễ chịu cho mắt ban đêm",
+      "systemDesc": "Theo cài đặt thiết bị",
+      "english": "English",
+      "vietnamese": "Tiếng Việt"
+    }
+  },
+  "units": {
+    "ml": "ml",
+    "min": "phút",
+    "kg": "kg",
+    "cm": "cm"
+  },
+  "time": {
+    "duration0": "0 phút",
+    "durationMin": "{{m}} phút",
+    "durationHour": "{{h}} giờ",
+    "durationHourMin": "{{h}} giờ {{m}} phút",
+    "justNow": "vừa xong",
+    "minAgo": "{{m}} phút trước",
+    "hourAgo": "{{h}} giờ trước",
+    "dayAgo": "{{d}} ngày trước",
+    "ageDays": "{{n}} ngày tuổi",
+    "ageMonths": "{{n}} tháng tuổi",
+    "ageYears": "{{y}} tuổi",
+    "ageYearsMonths": "{{y}} tuổi {{m}} tháng"
+  }
+}

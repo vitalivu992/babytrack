@@ -1,4 +1,5 @@
 import { useState, type FormEvent } from "react";
+import { useTranslation } from "react-i18next";
 import { type Child, type Gender } from "../api/types";
 import { Button } from "./Button";
 import { Input, Textarea } from "./Input";
@@ -47,6 +48,7 @@ export function ChildForm({
   submitting?: boolean;
   submitLabel?: string;
 }) {
+  const { t } = useTranslation();
   const [values, setValues] = useState<ChildFormValues>(initial ?? EMPTY);
 
   const set = <K extends keyof ChildFormValues>(key: K, val: ChildFormValues[K]) =>
@@ -60,69 +62,69 @@ export function ChildForm({
   return (
     <form onSubmit={handleSubmit} className="space-y-4" noValidate>
       <Input
-        label="Child's name"
+        label={t("child.form.name")}
         name="name"
         required
-        placeholder="Baby's name"
+        placeholder={t("child.form.namePlaceholder")}
         value={values.name}
         onChange={(e) => set("name", e.target.value)}
       />
       <div className="grid grid-cols-1 gap-4 sm:grid-cols-2">
         <Input
-          label="Date of birth"
+          label={t("child.form.birthDate")}
           name="birth_date"
           type="date"
           value={values.birth_date}
           onChange={(e) => set("birth_date", e.target.value)}
         />
         <Select
-          label="Gender"
+          label={t("child.form.gender")}
           value={values.gender}
           onValueChange={(v) => set("gender", v as Gender)}
-          placeholder="Select"
+          placeholder={t("child.form.select")}
           options={[
-            { value: "female", label: "Female" },
-            { value: "male", label: "Male" },
-            { value: "other", label: "Other / Prefer not to say" },
+            { value: "female", label: t("child.form.female") },
+            { value: "male", label: t("child.form.male") },
+            { value: "other", label: t("child.form.otherGender") },
           ]}
         />
       </div>
       <Input
-        label="Photo URL (optional)"
+        label={t("child.form.photoUrl")}
         name="photo_url"
-        placeholder="https://..."
+        placeholder={t("child.form.photoPlaceholder")}
         value={values.photo_url}
         onChange={(e) => set("photo_url", e.target.value)}
-        hint="Paste a link to your baby's photo."
+        hint={t("child.form.photoHint")}
       />
       <div className="grid grid-cols-1 gap-4 sm:grid-cols-2">
         <Select
-          label="Blood type (optional)"
+          label={t("child.form.bloodType")}
           value={values.blood_type}
           onValueChange={(v) => set("blood_type", v)}
-          placeholder="Unknown"
+          placeholder={t("child.form.unknown")}
           options={["O+", "O-", "A+", "A-", "B+", "B-", "AB+", "AB-"].map((b) => ({
             value: b,
             label: b,
           }))}
         />
         <Input
-          label="Allergies (optional)"
+          label={t("child.form.allergies")}
           name="allergies"
-          placeholder="e.g. peanuts"
+          placeholder={t("child.form.allergiesPlaceholder")}
           value={values.allergies}
           onChange={(e) => set("allergies", e.target.value)}
         />
       </div>
       <Textarea
-        label="Notes (optional)"
+        label={t("child.form.notes")}
         name="notes"
-        placeholder="Anything worth remembering..."
+        placeholder={t("child.form.notesPlaceholder")}
         value={values.notes}
         onChange={(e) => set("notes", e.target.value)}
       />
       <Button type="submit" size="lg" loading={submitting} className="w-full">
-        {submitLabel ?? "Save"}
+        {submitLabel ?? t("common.save")}
       </Button>
     </form>
   );

@@ -54,14 +54,14 @@ export function Select({
           <RadixSelect.Content
             position="popper"
             sideOffset={6}
-            className="z-50 max-h-72 min-w-[var(--radix-select-trigger-width)] overflow-hidden rounded-xl border border-slate-200 bg-white p-1 shadow-soft"
+            className="z-50 max-h-72 min-w-[var(--radix-select-trigger-width)] overflow-hidden rounded-xl border border-slate-200 bg-white p-1 shadow-soft dark:border-slate-700 dark:bg-slate-800"
           >
             <RadixSelect.Viewport className="w-full">
               {options.map((opt) => (
                 <RadixSelect.Item
                   key={opt.value}
                   value={opt.value}
-                  className="relative flex cursor-pointer select-none items-center rounded-lg py-2.5 pl-8 pr-3 text-sm text-slate-700 outline-none data-[highlighted]:bg-brand-50 data-[highlighted]:text-brand-700"
+                  className="relative flex cursor-pointer select-none items-center rounded-lg py-2.5 pl-8 pr-3 text-sm text-slate-700 outline-none data-[highlighted]:bg-brand-50 data-[highlighted]:text-brand-700 dark:text-slate-200 dark:data-[highlighted]:bg-brand-900/40 dark:data-[highlighted]:text-brand-200"
                 >
                   <RadixSelect.ItemIndicator className="absolute left-2.5 text-brand-500">
                     <Check />

@@ -1,17 +1,18 @@
 import { Link } from "react-router-dom";
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
-import { format } from "date-fns";
+import { useTranslation } from "react-i18next";
 import { createLog } from "../api/activities";
 import { dailySummary } from "../api/insights";
 import { listLogs } from "../api/activities";
 import { errorMessage } from "../api/client";
+import i18n from "../i18n";
 import type { CreateLogInput, LogType } from "../api/types";
 import { useActiveChild } from "../hooks/useActiveChild";
 import { useToast } from "../components/Toast";
 import { Card, StatCard } from "../components/Card";
 import { Button } from "../components/Button";
 import { describeLog, logTypeMeta, sleepMinutes } from "../lib/logs";
-import { formatDuration, timeAgo } from "../lib/utils";
+import { fmt, formatDuration, timeAgo } from "../lib/utils";
 import {
   BottleIcon,
   DiaperIcon,
@@ -21,7 +22,7 @@ import {
 
 interface Preset {
   key: string;
-  label: string;
+  labelKey: string;
   emoji: string;
   build: () => CreateLogInput;
 }
@@ -29,7 +30,7 @@ interface Preset {
 const PRESETS: Preset[] = [
   {
     key: "fed120",
-    label: "Fed 120ml",
+    labelKey: "dashboard.presets.fed120",
     emoji: "🍼",
     build: () => ({
       type: "feeding" as LogType,
@@ -38,13 +39,13 @@ const PRESETS: Preset[] = [
   },
   {
     key: "pooppee",
-    label: "Poop + Pee",
+    labelKey: "dashboard.presets.pooppee",
     emoji: "💩",
     build: () => ({ type: "diaper" as LogType, data: { contents: "both" } }),
   },
   {
     key: "nap1h",
-    label: "Quick nap (1h)",
+    labelKey: "dashboard.presets.nap1h",
     emoji: "😴",
     build: () => {
       const end = new Date();
@@ -63,6 +64,7 @@ const PRESETS: Preset[] = [
 ];
 
 export default function Dashboard() {
+  const { t } = useTranslation();
   const { activeChild } = useActiveChild();
   const toast = useToast();
   const qc = useQueryClient();
@@ -88,56 +90,60 @@ export default function Dashboard() {
       qc.invalidateQueries({ queryKey: ["logs", childId] });
       qc.invalidateQueries({ queryKey: ["daily", childId] });
       qc.invalidateQueries({ queryKey: ["weekly", childId] });
-      toast.success("Logged!", prettyPreset(input));
+      toast.success(t("dashboard.toast.logged"), prettyPreset(input));
     },
-    onError: (err) => toast.error("Couldn't save", errorMessage(err)),
+    onError: (err) => toast.error(t("dashboard.toast.couldNotSave"), errorMessage(err)),
   });
 
   return (
     <div className="space-y-6">
       <header className="flex items-end justify-between">
         <div>
-          <p className="text-sm font-medium text-brand-500">{format(new Date(), "EEEE, MMM d")}</p>
-          <h1 className="text-2xl font-bold text-slate-800">
-            {greeting()}, {activeChild ? activeChild.name.split(" ")[0] : "there"} 👋
+          <p className="text-sm font-medium text-brand-500 dark:text-brand-400">
+            {fmt(new Date(), "EEEE, MMM d")}
+          </p>
+          <h1 className="text-2xl font-bold text-slate-800 dark:text-slate-100">
+            {greeting()}, {activeChild ? activeChild.name.split(" ")[0] : t("dashboard.greeting.there")} 👋
           </h1>
         </div>
         <Link to="/app/log/new" className="hidden lg:block">
           <Button>
-            <PlusIcon className="h-5 w-5" /> Log
+            <PlusIcon className="h-5 w-5" /> {t("dashboard.log")}
           </Button>
         </Link>
       </header>
 
       {/* Today summary */}
       <section>
-        <h2 className="mb-3 text-sm font-semibold uppercase tracking-wide text-slate-400">Today</h2>
+        <h2 className="mb-3 text-sm font-semibold uppercase tracking-wide text-slate-400 dark:text-slate-500">
+          {t("dashboard.today")}
+        </h2>
         <div className="grid grid-cols-2 gap-3 lg:grid-cols-4">
           <StatCard
-            label="Feedings"
+            label={t("dashboard.summary.feedings")}
             value={summary?.feeding_count ?? 0}
-            sub={summary ? `${Math.round(summary.feeding_ml)} ml` : "—"}
+            sub={summary ? `${Math.round(summary.feeding_ml)} ${i18n.t("units.ml")}` : "—"}
             icon={<BottleIcon className="h-6 w-6" />}
             accent="brand"
           />
           <StatCard
-            label="Diapers"
+            label={t("dashboard.summary.diapers")}
             value={summary?.diaper_count ?? 0}
-            sub="changes"
+            sub={t("dashboard.summary.changes")}
             icon={<DiaperIcon className="h-6 w-6" />}
             accent="pink"
           />
           <StatCard
-            label="Sleep"
-            value={summary ? formatDuration(summary.sleep_minutes) : "0m"}
-            sub={summary ? `${summary.sleep_count} session(s)` : "—"}
+            label={t("dashboard.summary.sleep")}
+            value={summary ? formatDuration(summary.sleep_minutes) : i18n.t("time.duration0")}
+            sub={summary ? t("dashboard.summary.sessions", { count: summary.sleep_count }) : "—"}
             icon={<MoonIcon className="h-6 w-6" />}
             accent="sky"
           />
           <Link to="/app/log/new" className="contents">
-            <Card className="flex flex-col items-center justify-center gap-1 border-2 border-dashed border-brand-200 bg-brand-50/50 text-brand-600 hover:bg-brand-50">
+            <Card className="flex flex-col items-center justify-center gap-1 border-2 border-dashed border-brand-200 bg-brand-50/50 text-brand-600 hover:bg-brand-50 dark:border-brand-800 dark:bg-brand-900/20 dark:text-brand-300 dark:hover:bg-brand-900/40">
               <PlusIcon className="h-6 w-6" />
-              <span className="text-sm font-semibold">Log activity</span>
+              <span className="text-sm font-semibold">{t("dashboard.logActivity")}</span>
             </Card>
           </Link>
         </div>
@@ -145,8 +151,8 @@ export default function Dashboard() {
 
       {/* Quick presets */}
       <section>
-        <h2 className="mb-3 text-sm font-semibold uppercase tracking-wide text-slate-400">
-          Quick log
+        <h2 className="mb-3 text-sm font-semibold uppercase tracking-wide text-slate-400 dark:text-slate-500">
+          {t("dashboard.quickLog")}
         </h2>
         <div className="grid grid-cols-3 gap-3">
           {PRESETS.map((p) => (
@@ -154,10 +160,12 @@ export default function Dashboard() {
               key={p.key}
               disabled={quickLog.isPending || !childId}
               onClick={() => quickLog.mutate(p.build())}
-              className="flex flex-col items-center gap-1.5 rounded-2xl bg-white p-4 shadow-card transition hover:shadow-soft active:scale-95 disabled:opacity-50"
+              className="flex flex-col items-center gap-1.5 rounded-2xl bg-white p-4 shadow-card transition hover:shadow-soft active:scale-95 disabled:opacity-50 dark:bg-slate-800 dark:shadow-black/20"
             >
               <span className="text-3xl">{p.emoji}</span>
-              <span className="text-xs font-semibold text-slate-600">{p.label}</span>
+              <span className="text-xs font-semibold text-slate-600 dark:text-slate-300">
+                {t(p.labelKey)}
+              </span>
             </button>
           ))}
         </div>
@@ -166,14 +174,16 @@ export default function Dashboard() {
       {/* Recent activity */}
       <section>
         <div className="mb-3 flex items-center justify-between">
-          <h2 className="text-sm font-semibold uppercase tracking-wide text-slate-400">Recent</h2>
-          <Link to="/app/logs" className="text-sm font-semibold text-brand-600 hover:underline">
-            See all
+          <h2 className="text-sm font-semibold uppercase tracking-wide text-slate-400 dark:text-slate-500">
+            {t("dashboard.recent")}
+          </h2>
+          <Link to="/app/logs" className="text-sm font-semibold text-brand-600 hover:underline dark:text-brand-400">
+            {t("common.seeAll")}
           </Link>
         </div>
         {!recent || recent.length === 0 ? (
-          <Card className="text-center text-slate-400">
-            <p className="text-sm">No activity yet. Tap a quick log above to get started! 🌟</p>
+          <Card className="text-center text-slate-400 dark:text-slate-500">
+            <p className="text-sm">{t("dashboard.empty")}</p>
           </Card>
         ) : (
           <ul className="space-y-2">
@@ -187,10 +197,10 @@ export default function Dashboard() {
                       <Icon className="h-5 w-5" />
                     </div>
                     <div className="min-w-0 flex-1">
-                      <p className="truncate text-sm font-semibold text-slate-700">
+                      <p className="truncate text-sm font-semibold text-slate-700 dark:text-slate-200">
                         {describeLog(log)}
                       </p>
-                      <p className="text-xs text-slate-400">
+                      <p className="text-xs text-slate-400 dark:text-slate-500">
                         {log.logged_by_name ? `${log.logged_by_name} · ` : ""}
                         {timeAgo(log.timestamp)}
                         {log.type === "sleep" && sleepMinutes(log) > 0
@@ -211,20 +221,24 @@ export default function Dashboard() {
 
 function greeting(): string {
   const h = new Date().getHours();
-  if (h < 12) return "Good morning";
-  if (h < 18) return "Good afternoon";
-  return "Good evening";
+  if (h < 12) return i18n.t("dashboard.greeting.morning");
+  if (h < 18) return i18n.t("dashboard.greeting.afternoon");
+  return i18n.t("dashboard.greeting.evening");
 }
 
 function prettyPreset(input: CreateLogInput): string {
   switch (input.type) {
     case "feeding":
-      return `${input.data.subtype} logged`;
+      return i18n.t("dashboard.toast.feedingLogged", {
+        subtype: i18n.t(`logs.subtypes.${input.data.subtype ?? "feeding"}`, {
+          defaultValue: input.data.subtype ?? "",
+        }),
+      });
     case "diaper":
-      return "Diaper change logged";
+      return i18n.t("dashboard.toast.diaperLogged");
     case "sleep":
-      return "Sleep logged";
+      return i18n.t("dashboard.toast.sleepLogged");
     default:
-      return "Logged";
+      return i18n.t("dashboard.toast.logged");
   }
 }

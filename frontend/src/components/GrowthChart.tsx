@@ -1,4 +1,5 @@
 import { useMemo } from "react";
+import { useTranslation } from "react-i18next";
 import {
   Area,
   CartesianGrid,
@@ -9,13 +10,14 @@ import {
   XAxis,
   YAxis,
 } from "recharts";
+import i18n from "../i18n";
 import type { GrowthSeries } from "../api/types";
 import { ageInMonths, percentileTable, type MeasurementKind, type PercentileRow } from "../lib/who";
 
-const KIND_LABEL: Record<MeasurementKind, string> = {
-  weight: "Weight (kg)",
-  height: "Length (cm)",
-  head_circumference: "Head circ. (cm)",
+const KIND_LABEL_KEY: Record<MeasurementKind, string> = {
+  weight: "growth.weight",
+  height: "growth.height",
+  head_circumference: "growth.head",
 };
 
 const KIND_COLOR: Record<MeasurementKind, string> = {
@@ -23,6 +25,10 @@ const KIND_COLOR: Record<MeasurementKind, string> = {
   height: "#38bdf8",
   head_circumference: "#f472b6",
 };
+
+function kindLabel(kind: MeasurementKind): string {
+  return i18n.t(KIND_LABEL_KEY[kind]);
+}
 
 /** A growth chart: WHO percentile bands as a shaded area + the child's measured
  * points as a line. */
@@ -37,32 +43,34 @@ export function GrowthChart({
   birthDate?: string;
   gender: string;
 }) {
+  const { t } = useTranslation();
   const table = useMemo(() => percentileTable(kind, gender), [kind, gender]);
 
   const data = useMemo(() => buildChartData(table, series, birthDate), [table, series, birthDate]);
 
   const color = KIND_COLOR[kind];
   const measured = (series?.points ?? []).filter((p) => birthDate && p.value > 0);
+  const label = kindLabel(kind);
 
   return (
     <div className="card">
       <div className="mb-2 flex items-center justify-between">
-        <h3 className="text-sm font-semibold text-slate-700">{KIND_LABEL[kind]}</h3>
+        <h3 className="text-sm font-semibold text-slate-700 dark:text-slate-200">{label}</h3>
         {measured.length > 0 && (
-          <span className="chip bg-brand-50 text-brand-600">
-            Latest: {measured[measured.length - 1].value}
+          <span className="chip bg-brand-50 text-brand-600 dark:bg-brand-900/40 dark:text-brand-300">
+            {t("growth.latest", { value: measured[measured.length - 1].value })}
           </span>
         )}
       </div>
       {measured.length === 0 ? (
-        <p className="py-8 text-center text-sm text-slate-400">
-          No {KIND_LABEL[kind].toLowerCase()} measurements yet. Log one from the Measure tab.
+        <p className="py-8 text-center text-sm text-slate-400 dark:text-slate-500">
+          {t("growth.empty", { kind: label.toLowerCase() })}
         </p>
       ) : (
         <div className="h-56 w-full">
           <ResponsiveContainer width="100%" height="100%">
             <ComposedChart data={data} margin={{ top: 8, right: 8, bottom: 4, left: -16 }}>
-              <CartesianGrid strokeDasharray="3 3" stroke="#eef2ff" />
+              <CartesianGrid strokeDasharray="3 3" stroke="currentColor" className="text-slate-100 dark:text-slate-700" />
               <XAxis
                 dataKey="month"
                 type="number"
@@ -82,17 +90,19 @@ export function GrowthChart({
                   borderRadius: 12,
                   border: "1px solid #ede9fe",
                   fontSize: 12,
+                  background: "rgb(30 41 59)",
+                  color: "#e2e8f0",
                 }}
                 formatter={(value: number, name: string) => [`${value} ${unitFor(kind)}`, prettyName(name)]}
-                labelFormatter={(m) => `Age: ${Math.round(Number(m))} months`}
+                labelFormatter={(m) => t("growth.age", { n: Math.round(Number(m)) })}
               />
               {/* WHO bands: shade between p3–p97 with p50 line. */}
               <Area
                 type="monotone"
                 dataKey="p97"
                 stroke="none"
-                fill="#ede9fe"
-                fillOpacity={0.4}
+                fill="#a78bfa"
+                fillOpacity={0.25}
                 name="97th"
                 isAnimationActive={false}
               />
@@ -100,7 +110,7 @@ export function GrowthChart({
                 type="monotone"
                 dataKey="p3"
                 stroke="none"
-                fill="#ffffff"
+                fill="transparent"
                 fillOpacity={1}
                 name="3rd"
                 isAnimationActive={false}
@@ -121,17 +131,17 @@ export function GrowthChart({
                 stroke={color}
                 strokeWidth={3}
                 dot={{ r: 4, fill: color }}
-                name="Your child"
+                name={t("growth.yourChild")}
                 connectNulls
               />
             </ComposedChart>
           </ResponsiveContainer>
         </div>
       )}
-      <div className="mt-2 flex items-center justify-center gap-3 text-[11px] text-slate-400">
-        <LegendDot color={color} label="Your child" />
-        <LegendDot color="#c4b5fd" label="WHO 50th" dashed />
-        <LegendDot color="#ede9fe" label="3rd–97th band" />
+      <div className="mt-2 flex items-center justify-center gap-3 text-[11px] text-slate-400 dark:text-slate-500">
+        <LegendDot color={color} label={t("growth.yourChild")} />
+        <LegendDot color="#c4b5fd" label={t("growth.who50")} dashed />
+        <LegendDot color="#a78bfa" label={t("growth.band")} />
       </div>
     </div>
   );
@@ -165,8 +175,11 @@ function buildChartData(
 
 const round1 = (n: number) => Math.round(n * 10) / 10;
 const unitFor = (k: MeasurementKind) => (k === "weight" ? "kg" : "cm");
-const prettyName = (name: string) =>
-  name === "child" ? "Your child" : name === "p50" ? "WHO 50th" : `WHO ${name}`;
+function prettyName(name: string): string {
+  if (name === "child") return i18n.t("growth.yourChild");
+  if (name === "p50") return i18n.t("growth.who50");
+  return `WHO ${name}`;
+}
 
 function LegendDot({ color, label, dashed }: { color: string; label: string; dashed?: boolean }) {
   return (

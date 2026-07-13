@@ -28,11 +28,11 @@ export const Input = forwardRef<HTMLInputElement, InputProps>(function Input(
         {...rest}
       />
       {error ? (
-        <p id={`${inputId}-error`} className="mt-1 text-sm text-rose-600">
+        <p id={`${inputId}-error`} className="mt-1 text-sm text-rose-600 dark:text-rose-400">
           {error}
         </p>
       ) : hint ? (
-        <p className="mt-1 text-xs text-slate-400">{hint}</p>
+        <p className="mt-1 text-xs text-slate-400 dark:text-slate-500">{hint}</p>
       ) : null}
     </div>
   );

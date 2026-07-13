@@ -1,6 +1,7 @@
 import { useMemo, useState } from "react";
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
-import { format, isSameDay } from "date-fns";
+import { isSameDay } from "date-fns";
+import { useTranslation } from "react-i18next";
 import { deleteLog, listLogs } from "../api/activities";
 import { errorMessage } from "../api/client";
 import type { ActivityLog, LogType } from "../api/types";
@@ -11,20 +12,12 @@ import { Select } from "../components/Select";
 import { Button } from "../components/Button";
 import { Modal } from "../components/Modal";
 import { describeLog, logTypeMeta, sleepMinutes } from "../lib/logs";
-import { formatDuration } from "../lib/utils";
+import { fmt, formatDuration } from "../lib/utils";
 import { TrashIcon } from "../components/icons";
-
-const TYPE_FILTERS = [
-  { value: "", label: "All activities" },
-  { value: "feeding", label: "Feeding" },
-  { value: "diaper", label: "Diaper" },
-  { value: "sleep", label: "Sleep" },
-  { value: "measurement", label: "Measurement" },
-  { value: "medicine", label: "Medicine" },
-  { value: "other", label: "Other" },
-];
+import i18n from "../i18n";
 
 export default function LogHistory() {
+  const { t } = useTranslation();
   const { activeChild, canEdit } = useActiveChild();
   const toast = useToast();
   const qc = useQueryClient();
@@ -57,53 +50,69 @@ export default function LogHistory() {
     onSuccess: () => {
       qc.invalidateQueries({ queryKey: ["logs", childId] });
       qc.invalidateQueries({ queryKey: ["daily", childId] });
-      toast.success("Log deleted");
+      toast.success(t("logs.history.deletedToast"));
       setToDelete(null);
     },
-    onError: (err) => toast.error("Couldn't delete", errorMessage(err)),
+    onError: (err) => toast.error(t("logs.history.couldNotDelete"), errorMessage(err)),
   });
 
   // Group logs by day for the timeline.
   const grouped = useMemo(() => groupByDay(logs), [logs]);
 
+  const typeFilters = [
+    { value: "", label: t("logs.history.allActivities") },
+    { value: "feeding", label: t("logs.types.feeding") },
+    { value: "diaper", label: t("logs.types.diaper") },
+    { value: "sleep", label: t("logs.types.sleep") },
+    { value: "measurement", label: t("logs.types.measurement") },
+    { value: "medicine", label: t("logs.types.medicine") },
+    { value: "other", label: t("logs.types.other") },
+  ];
+
   return (
     <div className="space-y-5">
       <header>
-        <h1 className="text-2xl font-bold text-slate-800">Activity history</h1>
-        <p className="text-sm text-slate-500">All logs for {activeChild?.name ?? "your child"}.</p>
+        <h1 className="text-2xl font-bold text-slate-800 dark:text-slate-100">
+          {t("logs.history.title")}
+        </h1>
+        <p className="text-sm text-slate-500 dark:text-slate-400">
+          {t("logs.history.subtitle", { name: activeChild?.name ?? "" })}
+        </p>
       </header>
 
       <Card className="grid grid-cols-2 gap-3">
         <Select
-          label="Filter by type"
+          label={t("logs.history.filterByType")}
           value={type}
           onValueChange={setType}
-          options={TYPE_FILTERS}
+          options={typeFilters}
         />
         <Select
-          label="Time range"
+          label={t("logs.history.timeRange")}
           value={days}
           onValueChange={setDays}
           options={[
-            { value: "1", label: "Today" },
-            { value: "7", label: "Last 7 days" },
-            { value: "30", label: "Last 30 days" },
-            { value: "90", label: "Last 90 days" },
+            { value: "1", label: t("common.today") },
+            { value: "7", label: t("logs.history.last7") },
+            { value: "30", label: t("logs.history.last30") },
+            { value: "90", label: t("logs.history.last90") },
           ]}
         />
       </Card>
 
       {isLoading ? (
-        <p className="py-8 text-center text-sm text-slate-400">Loading…</p>
+        <p className="py-8 text-center text-sm text-slate-400 dark:text-slate-500">
+          {t("common.loading")}
+        </p>
       ) : logs.length === 0 ? (
-        <Card className="py-10 text-center text-slate-400">
-          <p className="text-sm">No logs match these filters.</p>
+        <Card className="py-10 text-center text-slate-400 dark:text-slate-500">
+          <p className="text-sm">{t("logs.history.noMatch")}</p>
         </Card>
       ) : (
         <div className="space-y-6">
           {grouped.map(({ label, items }) => (
             <section key={label}>
-              <h2 className="mb-2 px-1 text-xs font-semibold uppercase tracking-wide text-slate-400">
+              <h2 className="mb-2 px-1 text-xs font-semibold uppercase tracking-wide text-slate-400 dark:text-slate-500">
                 {label}
               </h2>
               <ul className="space-y-2">
@@ -124,24 +133,24 @@ export default function LogHistory() {
       <Modal
         open={!!toDelete}
         onOpenChange={(o) => !o && setToDelete(null)}
-        title="Delete log?"
+        title={t("logs.history.deleteTitle")}
         description={toDelete ? describeLog(toDelete) : undefined}
         footer={
           <>
             <Button variant="ghost" onClick={() => setToDelete(null)}>
-              Cancel
+              {t("common.cancel")}
             </Button>
             <Button
               variant="danger"
               loading={remove.isPending}
               onClick={() => toDelete && remove.mutate(toDelete.id)}
             >
-              Delete
+              {t("common.delete")}
             </Button>
           </>
         }
       >
-        <p className="text-sm text-slate-600">This can't be undone.</p>
+        <p className="text-sm text-slate-600 dark:text-slate-300">{t("logs.history.cannotUndo")}</p>
       </Modal>
     </div>
   );
@@ -156,6 +165,7 @@ function LogRow({
   canEdit: boolean;
   onDelete: () => void;
 }) {
+  const { t } = useTranslation();
   const meta = logTypeMeta(log.type);
   const Icon = meta.icon;
   const sleep = log.type === "sleep" ? sleepMinutes(log) : 0;
@@ -166,19 +176,25 @@ function LogRow({
           <Icon className="h-5 w-5" />
         </div>
         <div className="min-w-0 flex-1">
-          <p className="truncate text-sm font-semibold text-slate-700">{describeLog(log)}</p>
-          <p className="text-xs text-slate-400">
-            {format(new Date(log.timestamp), "p")}
+          <p className="truncate text-sm font-semibold text-slate-700 dark:text-slate-200">
+            {describeLog(log)}
+          </p>
+          <p className="text-xs text-slate-400 dark:text-slate-500">
+            {fmt(log.timestamp, "p")}
             {sleep > 0 ? ` · ${formatDuration(sleep)}` : ""}
             {log.logged_by_name ? ` · ${log.logged_by_name}` : ""}
           </p>
-          {log.note && <p className="mt-1 truncate text-xs italic text-slate-500">“{log.note}”</p>}
+          {log.note && (
+            <p className="mt-1 truncate text-xs italic text-slate-500 dark:text-slate-400">
+              “{log.note}”
+            </p>
+          )}
         </div>
         {canEdit && (
           <button
             onClick={onDelete}
-            aria-label="Delete log"
-            className="rounded-lg p-2 text-slate-300 transition hover:bg-rose-50 hover:text-rose-500"
+            aria-label={t("common.delete")}
+            className="rounded-lg p-2 text-slate-300 transition hover:bg-rose-50 hover:text-rose-500 dark:text-slate-600 dark:hover:bg-rose-500/10 dark:hover:text-rose-400"
           >
             <TrashIcon className="h-4 w-4" />
           </button>
@@ -194,7 +210,7 @@ function groupByDay(logs: ActivityLog[]): { label: string; items: ActivityLog[] 
   const buckets = new Map<string, ActivityLog[]>();
   for (const log of logs) {
     const d = new Date(log.timestamp);
-    const key = format(d, "yyyy-MM-dd");
+    const key = fmt(d, "yyyy-MM-dd");
     const arr = buckets.get(key) ?? [];
     arr.push(log);
     buckets.set(key, arr);
@@ -204,10 +220,10 @@ function groupByDay(logs: ActivityLog[]): { label: string; items: ActivityLog[] 
     .map(([key, items]) => {
       const d = new Date(key);
       const label = isSameDay(d, today)
-        ? "Today"
+        ? i18n.t("common.today")
         : isSameDay(d, yesterday)
-        ? "Yesterday"
-        : format(d, "EEE, MMM d");
+        ? i18n.t("common.yesterday")
+        : fmt(d, "EEE, MMM d");
       return {
         label,
         items: items.sort((a, b) => (a.timestamp < b.timestamp ? 1 : -1)),

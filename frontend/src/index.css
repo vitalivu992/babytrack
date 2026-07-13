@@ -5,6 +5,9 @@
 :root {
   color-scheme: light;
 }
+html.dark {
+  color-scheme: dark;
+}
 
 html,
 body,
@@ -13,13 +16,15 @@ body,
 }
 
 body {
-  @apply bg-gradient-to-b from-brand-50 via-pink-soft/20 to-sky-soft/20 text-slate-700 antialiased;
+  @apply bg-gradient-to-b from-brand-50 via-pink-soft/20 to-sky-soft/20 text-slate-700 antialiased
+    dark:from-slate-900 dark:via-slate-900 dark:to-slate-800 dark:text-slate-200;
   font-feature-settings: "cv02", "cv03", "cv04", "cv11";
 }
 
 /* Accessible focus ring for keyboard users. */
 :focus-visible {
-  @apply outline-none ring-2 ring-brand-400 ring-offset-2 ring-offset-white rounded-lg;
+  @apply outline-none ring-2 ring-brand-400 ring-offset-2 ring-offset-white rounded-lg
+    dark:ring-brand-500 dark:ring-offset-slate-900;
 }
 
 /* Hide number input spinners for a cleaner look. */
@@ -39,14 +44,17 @@ input[type="number"] {
   }
   .input {
     @apply w-full rounded-xl border border-slate-200 bg-white/80 px-4 py-3 text-slate-700
-      placeholder:text-slate-400 shadow-sm transition
-      focus:border-brand-400 focus:ring-2 focus:ring-brand-200;
+        placeholder:text-slate-400 shadow-sm transition
+        focus:border-brand-400 focus:ring-2 focus:ring-brand-200
+        dark:border-slate-700 dark:bg-slate-800/80 dark:text-slate-100
+        dark:placeholder:text-slate-500 dark:focus:border-brand-500 dark:focus:ring-brand-900/50;
   }
   .label {
-    @apply mb-1.5 block text-sm font-medium text-slate-600;
+    @apply mb-1.5 block text-sm font-medium text-slate-600 dark:text-slate-300;
   }
   .card {
-    @apply rounded-2xl bg-white/90 p-5 shadow-card backdrop-blur-sm;
+    @apply rounded-2xl bg-white/90 p-5 shadow-card backdrop-blur-sm
+      dark:bg-slate-800/80 dark:shadow-black/20;
   }
   .chip {
     @apply inline-flex items-center gap-1 rounded-full px-3 py-1 text-xs font-semibold;

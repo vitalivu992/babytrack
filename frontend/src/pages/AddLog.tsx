@@ -1,6 +1,7 @@
 import { useEffect, useMemo, useState, type Dispatch, type SetStateAction } from "react";
 import { useNavigate, useSearchParams } from "react-router-dom";
 import { useMutation, useQueryClient } from "@tanstack/react-query";
+import { useTranslation } from "react-i18next";
 import { createLog } from "../api/activities";
 import type { CreateLogInput, LogData, LogType } from "../api/types";
 import { errorMessage } from "../api/client";
@@ -22,14 +23,17 @@ import { useActiveChild } from "../hooks/useActiveChild";
 
 type TabKey = "feeding" | "diaper" | "sleep" | "measurement" | "medicine" | "other";
 
-const TABS = [
-  { value: "feeding" as TabKey, label: "Feed", icon: <BottleIcon className="h-4 w-4" /> },
-  { value: "diaper" as TabKey, label: "Diaper", icon: <DiaperIcon className="h-4 w-4" /> },
-  { value: "sleep" as TabKey, label: "Sleep", icon: <MoonIcon className="h-4 w-4" /> },
-  { value: "measurement" as TabKey, label: "Measure", icon: <RulerIcon className="h-4 w-4" /> },
-  { value: "medicine" as TabKey, label: "Medicine", icon: <PillIcon className="h-4 w-4" /> },
-  { value: "other" as TabKey, label: "Other", icon: <SparkleIcon className="h-4 w-4" /> },
-];
+function useTabsConfig() {
+  const { t } = useTranslation();
+  return [
+    { value: "feeding" as TabKey, label: t("logs.add.tabs.feed"), icon: <BottleIcon className="h-4 w-4" /> },
+    { value: "diaper" as TabKey, label: t("logs.add.tabs.diaper"), icon: <DiaperIcon className="h-4 w-4" /> },
+    { value: "sleep" as TabKey, label: t("logs.add.tabs.sleep"), icon: <MoonIcon className="h-4 w-4" /> },
+    { value: "measurement" as TabKey, label: t("logs.add.tabs.measure"), icon: <RulerIcon className="h-4 w-4" /> },
+    { value: "medicine" as TabKey, label: t("logs.add.tabs.medicine"), icon: <PillIcon className="h-4 w-4" /> },
+    { value: "other" as TabKey, label: t("logs.add.tabs.other"), icon: <SparkleIcon className="h-4 w-4" /> },
+  ];
+}
 
 const nowLocalInput = (d = new Date()) => {
   const off = d.getTimezoneOffset();
@@ -37,6 +41,7 @@ const nowLocalInput = (d = new Date()) => {
 };
 
 export default function AddLog() {
+  const { t } = useTranslation();
   const navigate = useNavigate();
   const [params, setParams] = useSearchParams();
   const initialTab = (params.get("tab") as TabKey) || "feeding";
@@ -49,6 +54,7 @@ export default function AddLog() {
   const close = () => navigate(-1);
 
   const buildInput = useBuildLog(tab);
+  const TABS = useTabsConfig();
 
   const mutation = useMutation({
     mutationFn: async (input: CreateLogInput) => {
@@ -61,10 +67,10 @@ export default function AddLog() {
       qc.invalidateQueries({ queryKey: ["weekly"] });
       qc.invalidateQueries({ queryKey: ["feeding-stats"] });
       qc.invalidateQueries({ queryKey: ["sleep-stats"] });
-      toast.success("Logged!");
+      toast.success(t("dashboard.toast.logged"));
       close();
     },
-    onError: (err) => toast.error("Couldn't save log", errorMessage(err)),
+    onError: (err) => toast.error(t("dashboard.toast.couldNotSave"), errorMessage(err)),
   });
 
   // Keep the URL param in sync with the active tab for shareable state.
@@ -96,15 +102,15 @@ export default function AddLog() {
     <Modal
       open
       onOpenChange={(o) => !o && close()}
-      title="Log activity"
+      title={t("logs.add.title")}
       description={activeChild ? activeChild.name : undefined}
       footer={
         <>
           <Button variant="ghost" onClick={handleReset} disabled={mutation.isPending}>
-            Reset
+            {t("logs.add.reset")}
           </Button>
           <Button onClick={handleSubmit} loading={mutation.isPending} disabled={!ready}>
-            Save log
+            {t("logs.add.saveLog")}
           </Button>
         </>
       }
@@ -132,14 +138,14 @@ export default function AddLog() {
         </Tabs>
 
         <Input
-          label="Time"
+          label={t("logs.add.time")}
           type="datetime-local"
           value={stamp}
           onChange={(e) => setStamp(e.target.value)}
         />
         <Textarea
-          label="Note (optional)"
-          placeholder="Anything to remember..."
+          label={t("logs.add.note")}
+          placeholder={t("logs.add.notePlaceholder")}
           value={note}
           onChange={(e) => setNote(e.target.value)}
         />
@@ -255,36 +261,37 @@ interface FormProps {
 }
 
 function FeedingForm({ data, setData }: FormProps) {
+  const { t } = useTranslation();
   const subtype = (data.subtype as string) || "";
   return (
     <div className="space-y-4">
       <Select
-        label="Type"
+        label={t("logs.add.feeding.type")}
         value={subtype}
         onValueChange={(v) => setData((d) => ({ ...d, subtype: v }))}
-        placeholder="Select feeding type"
+        placeholder={t("logs.add.feeding.typePlaceholder")}
         options={[
-          { value: "breast", label: "Breastfeed" },
-          { value: "formula", label: "Bottle (formula)" },
-          { value: "solid", label: "Solid food" },
-          { value: "pumping", label: "Pumping" },
+          { value: "breast", label: t("logs.subtypes.breast") },
+          { value: "formula", label: t("logs.subtypes.formula") },
+          { value: "solid", label: t("logs.subtypes.solid") },
+          { value: "pumping", label: t("logs.subtypes.pumping") },
         ]}
       />
       {subtype === "breast" && (
         <div className="grid grid-cols-2 gap-3">
           <Select
-            label="Side"
+            label={t("logs.add.feeding.side")}
             value={(data.side as string) || ""}
             onValueChange={(v) => setData((d) => ({ ...d, side: v }))}
-            placeholder="Select"
+            placeholder={t("logs.add.feeding.select")}
             options={[
-              { value: "left", label: "Left" },
-              { value: "right", label: "Right" },
-              { value: "both", label: "Both" },
+              { value: "left", label: t("logs.add.feeding.left") },
+              { value: "right", label: t("logs.add.feeding.right") },
+              { value: "both", label: t("logs.add.feeding.both") },
             ]}
           />
           <Input
-            label="Duration (min)"
+            label={t("logs.add.feeding.duration")}
             type="number"
             min={0}
             value={valueOrEmpty(data.duration_min)}
@@ -294,7 +301,7 @@ function FeedingForm({ data, setData }: FormProps) {
       )}
       {(subtype === "formula" || subtype === "pumping") && (
         <Input
-          label="Amount (ml)"
+          label={t("logs.add.feeding.amount")}
           type="number"
           min={0}
           value={valueOrEmpty(data.amount_ml)}
@@ -303,8 +310,8 @@ function FeedingForm({ data, setData }: FormProps) {
       )}
       {subtype === "solid" && (
         <Input
-          label="Food description"
-          placeholder="e.g. mashed banana"
+          label={t("logs.add.feeding.food")}
+          placeholder={t("logs.add.feeding.foodPlaceholder")}
           value={(data.food as string) || ""}
           onChange={(e) => setData((d) => ({ ...d, food: e.target.value }))}
         />
@@ -314,16 +321,17 @@ function FeedingForm({ data, setData }: FormProps) {
 }
 
 function DiaperForm({ data, setData }: FormProps) {
+  const { t } = useTranslation();
   const contents = (data.contents as string) || "";
-  const presets: { value: string; label: string; emoji: string }[] = [
-    { value: "pee", label: "Pee", emoji: "💧" },
-    { value: "poop", label: "Poop", emoji: "💩" },
-    { value: "both", label: "Both", emoji: "💩💧" },
+  const presets: { value: string; labelKey: string; emoji: string }[] = [
+    { value: "pee", labelKey: "logs.contents.pee", emoji: "💧" },
+    { value: "poop", labelKey: "logs.contents.poop", emoji: "💩" },
+    { value: "both", labelKey: "logs.contents.both", emoji: "💩💧" },
   ];
   return (
     <div className="space-y-4">
       <div>
-        <span className="label">Contents</span>
+        <span className="label">{t("logs.add.diaper.contents")}</span>
         <div className="grid grid-cols-3 gap-2">
           {presets.map((p) => (
             <button
@@ -333,12 +341,12 @@ function DiaperForm({ data, setData }: FormProps) {
               className={
                 "flex flex-col items-center gap-1 rounded-xl border-2 py-3 text-sm font-semibold transition " +
                 (contents === p.value
-                  ? "border-brand-400 bg-brand-50 text-brand-700"
-                  : "border-slate-200 bg-white text-slate-600 hover:border-brand-200")
+                  ? "border-brand-400 bg-brand-50 text-brand-700 dark:border-brand-500 dark:bg-brand-900/40 dark:text-brand-200"
+                  : "border-slate-200 bg-white text-slate-600 hover:border-brand-200 dark:border-slate-700 dark:bg-slate-800 dark:text-slate-300 dark:hover:border-brand-700")
               }
             >
               <span className="text-2xl">{p.emoji}</span>
-              {p.label}
+              {t(p.labelKey)}
             </button>
           ))}
         </div>
@@ -346,7 +354,7 @@ function DiaperForm({ data, setData }: FormProps) {
       {(contents === "poop" || contents === "both") && (
         <>
           <div>
-            <span className="label">Consistency (Bristol stool scale)</span>
+            <span className="label">{t("logs.add.diaper.consistency")}</span>
             <div className="flex gap-1.5">
               {[1, 2, 3, 4, 5, 6, 7].map((n) => (
                 <button
@@ -357,7 +365,7 @@ function DiaperForm({ data, setData }: FormProps) {
                     "h-11 flex-1 rounded-lg text-sm font-bold transition " +
                     (Number(data.consistency) === n
                       ? "bg-brand-500 text-white"
-                      : "bg-brand-50 text-brand-600 hover:bg-brand-100")
+                      : "bg-brand-50 text-brand-600 hover:bg-brand-100 dark:bg-brand-900/30 dark:text-brand-300 dark:hover:bg-brand-900/50")
                   }
                 >
                   {n}
@@ -366,8 +374,8 @@ function DiaperForm({ data, setData }: FormProps) {
             </div>
           </div>
           <Input
-            label="Color (optional)"
-            placeholder="e.g. yellow, brown"
+            label={t("logs.add.diaper.color")}
+            placeholder={t("logs.add.diaper.colorPlaceholder")}
             value={(data.color as string) || ""}
             onChange={(e) => setData((d) => ({ ...d, color: e.target.value }))}
           />
@@ -378,39 +386,40 @@ function DiaperForm({ data, setData }: FormProps) {
 }
 
 function SleepForm({ data, setData }: FormProps) {
+  const { t } = useTranslation();
   const start = (data.start as string) || "";
   const end = (data.end as string) || "";
   return (
     <div className="space-y-4">
       <Select
-        label="Type"
+        label={t("logs.add.sleep.type")}
         value={(data.subtype as string) || "nap"}
         onValueChange={(v) => setData((d) => ({ ...d, subtype: v }))}
         options={[
-          { value: "nap", label: "Nap" },
-          { value: "night", label: "Night sleep" },
+          { value: "nap", label: t("logs.subtypes.nap") },
+          { value: "night", label: t("logs.subtypes.night") },
         ]}
       />
-      <div className="rounded-xl bg-brand-50 p-3 text-sm text-brand-700">
-        💡 Set a quick duration, or pick a start &amp; end time below.
+      <div className="rounded-xl bg-brand-50 p-3 text-sm text-brand-700 dark:bg-brand-900/30 dark:text-brand-200">
+        {t("logs.add.sleep.hint")}
       </div>
       <Input
-        label="Duration (minutes)"
+        label={t("logs.add.sleep.duration")}
         type="number"
         min={0}
         value={valueOrEmpty(data.duration_minutes)}
         onChange={(e) => setData((d) => ({ ...d, duration_minutes: e.target.value }))}
-        placeholder="e.g. 45"
+        placeholder={t("logs.add.sleep.durationPlaceholder")}
       />
       <div className="grid grid-cols-2 gap-3">
         <Input
-          label="Start"
+          label={t("logs.add.sleep.start")}
           type="datetime-local"
           value={start ? start.slice(0, 16) : ""}
           onChange={(e) => setData((d) => ({ ...d, start: new Date(e.target.value).toISOString() }))}
         />
         <Input
-          label="End"
+          label={t("logs.add.sleep.end")}
           type="datetime-local"
           value={end ? end.slice(0, 16) : ""}
           onChange={(e) => setData((d) => ({ ...d, end: new Date(e.target.value).toISOString() }))}
@@ -421,23 +430,24 @@ function SleepForm({ data, setData }: FormProps) {
 }
 
 function MeasurementForm({ data, setData }: FormProps) {
+  const { t } = useTranslation();
   const mtype = (data.measurement_type as string) || "";
   return (
     <div className="space-y-4">
       <Select
-        label="Measurement"
+        label={t("logs.add.measurement.measurement")}
         value={mtype}
         onValueChange={(v) => setData((d) => ({ ...d, measurement_type: v }))}
-        placeholder="Select"
+        placeholder={t("logs.add.measurement.select")}
         options={[
-          { value: "weight", label: "Weight" },
-          { value: "height", label: "Height / Length" },
-          { value: "head_circumference", label: "Head circumference" },
+          { value: "weight", label: t("logs.measureTypes.weight") },
+          { value: "height", label: t("logs.measureTypes.height") },
+          { value: "head_circumference", label: t("logs.measureTypes.head_circumference") },
         ]}
       />
       <div className="grid grid-cols-2 gap-3">
         <Input
-          label="Value"
+          label={t("logs.add.measurement.value")}
           type="number"
           step="0.01"
           min={0}
@@ -445,30 +455,31 @@ function MeasurementForm({ data, setData }: FormProps) {
           onChange={(e) => setData((d) => ({ ...d, value: e.target.value }))}
         />
         <Input
-          label="Unit"
+          label={t("logs.add.measurement.unit")}
           value={(data.unit as string) || defaultUnit(mtype)}
           onChange={(e) => setData((d) => ({ ...d, unit: e.target.value }))}
         />
       </div>
-      <p className="text-xs text-slate-400">
-        This also creates a growth data point you can chart on the Child profile.
+      <p className="text-xs text-slate-400 dark:text-slate-500">
+        {t("logs.add.measurement.hint")}
       </p>
     </div>
   );
 }
 
 function MedicineForm({ data, setData }: FormProps) {
+  const { t } = useTranslation();
   return (
     <div className="space-y-4">
       <Input
-        label="Medicine name"
-        placeholder="e.g. Paracetamol"
+        label={t("logs.add.medicine.name")}
+        placeholder={t("logs.add.medicine.namePlaceholder")}
         value={(data.name as string) || ""}
         onChange={(e) => setData((d) => ({ ...d, name: e.target.value }))}
       />
       <Input
-        label="Dose"
-        placeholder="e.g. 2.5 ml"
+        label={t("logs.add.medicine.dose")}
+        placeholder={t("logs.add.medicine.dosePlaceholder")}
         value={(data.dose as string) || ""}
         onChange={(e) => setData((d) => ({ ...d, dose: e.target.value }))}
       />
@@ -477,20 +488,21 @@ function MedicineForm({ data, setData }: FormProps) {
 }
 
 function OtherForm({ data, setData }: FormProps) {
+  const { t } = useTranslation();
   return (
     <div className="space-y-4">
       <Select
-        label="Activity"
+        label={t("logs.add.other.activity")}
         value={(data.category as string) || ""}
         onValueChange={(v) => setData((d) => ({ ...d, category: v }))}
-        placeholder="Select"
+        placeholder={t("logs.add.other.select")}
         options={[
-          { value: "tummy_time", label: "Tummy time" },
-          { value: "bath", label: "Bath" },
-          { value: "milestone", label: "Milestone" },
-          { value: "doctor_visit", label: "Doctor visit" },
-          { value: "play", label: "Play" },
-          { value: "mood", label: "Mood" },
+          { value: "tummy_time", label: t("logs.add.other.tummyTime") },
+          { value: "bath", label: t("logs.add.other.bath") },
+          { value: "milestone", label: t("logs.add.other.milestone") },
+          { value: "doctor_visit", label: t("logs.add.other.doctorVisit") },
+          { value: "play", label: t("logs.add.other.play") },
+          { value: "mood", label: t("logs.add.other.mood") },
         ]}
       />
     </div>

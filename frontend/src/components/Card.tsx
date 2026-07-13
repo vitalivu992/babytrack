@@ -22,7 +22,11 @@ export function Card({ children, className, title, action, onClick }: CardProps)
     >
       {(title || action) && (
         <div className="mb-3 flex items-center justify-between gap-2">
-          {title && <h3 className="text-sm font-semibold text-slate-700">{title}</h3>}
+          {title && (
+            <h3 className="text-sm font-semibold text-slate-700 dark:text-slate-200">
+              {title}
+            </h3>
+          )}
           {action}
         </div>
       )}
@@ -46,11 +50,11 @@ export function StatCard({
   accent?: "brand" | "pink" | "sky" | "mint" | "peach";
 }) {
   const accents: Record<string, string> = {
-    brand: "bg-brand-50 text-brand-600",
-    pink: "bg-pink-soft/40 text-pink-700",
-    sky: "bg-sky-soft/40 text-sky-700",
-    mint: "bg-mint-soft/40 text-emerald-700",
-    peach: "bg-peach-soft/40 text-orange-700",
+    brand: "bg-brand-50 text-brand-600 dark:bg-brand-900/40 dark:text-brand-300",
+    pink: "bg-pink-soft/40 text-pink-700 dark:bg-pink-soft/20 dark:text-pink-300",
+    sky: "bg-sky-soft/40 text-sky-700 dark:bg-sky-soft/20 dark:text-sky-300",
+    mint: "bg-mint-soft/40 text-emerald-700 dark:bg-mint-soft/20 dark:text-emerald-300",
+    peach: "bg-peach-soft/40 text-orange-700 dark:bg-peach-soft/20 dark:text-orange-300",
   };
   return (
     <Card className="flex items-center gap-4 p-4">
@@ -60,9 +64,11 @@ export function StatCard({
         </div>
       )}
       <div className="min-w-0">
-        <p className="truncate text-xs font-medium uppercase tracking-wide text-slate-400">{label}</p>
-        <p className="text-2xl font-bold text-slate-800">{value}</p>
-        {sub && <p className="truncate text-xs text-slate-400">{sub}</p>}
+        <p className="truncate text-xs font-medium uppercase tracking-wide text-slate-400 dark:text-slate-500">
+          {label}
+        </p>
+        <p className="text-2xl font-bold text-slate-800 dark:text-slate-100">{value}</p>
+        {sub && <p className="truncate text-xs text-slate-400 dark:text-slate-500">{sub}</p>}
       </div>
     </Card>
   );

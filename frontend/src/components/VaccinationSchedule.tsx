@@ -1,6 +1,7 @@
-import { useMemo } from "react";
+import { useMemo, useState } from "react";
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
-import { differenceInCalendarDays, format } from "date-fns";
+import { differenceInCalendarDays } from "date-fns";
+import { useTranslation } from "react-i18next";
 import {
   ensureSchedule,
   listVaccinations,
@@ -15,9 +16,10 @@ import { Button } from "./Button";
 import { Input } from "./Input";
 import { Modal } from "./Modal";
 import { CheckIcon, SyringeIcon } from "./icons";
-import { useState } from "react";
+import { fmt } from "../lib/utils";
 
 export function VaccinationSchedule({ canEdit }: { canEdit: boolean }) {
+  const { t } = useTranslation();
   const { activeChild } = useActiveChild();
   const childId = activeChild?.id ?? "";
   const toast = useToast();
@@ -33,7 +35,7 @@ export function VaccinationSchedule({ canEdit }: { canEdit: boolean }) {
         return await ensureSchedule(childId);
       } catch (err) {
         // ensure may 403 for viewers without birthdate; fall back to list.
-        toast.error("Couldn't generate schedule", errorMessage(err));
+        toast.error(t("vaccination.couldNotGenerate"), errorMessage(err));
         return listVaccinations(childId);
       }
     },
@@ -50,10 +52,10 @@ export function VaccinationSchedule({ canEdit }: { canEdit: boolean }) {
       markAdministered(childId, id, { administered_date: date, lot_number: lot || undefined }),
     onSuccess: () => {
       qc.invalidateQueries({ queryKey: ["vaccinations", childId] });
-      toast.success("Vaccine recorded!");
+      toast.success(t("vaccination.recordedToast"));
       closeRecord();
     },
-    onError: (err) => toast.error("Couldn't record", errorMessage(err)),
+    onError: (err) => toast.error(t("vaccination.couldNotRecord"), errorMessage(err)),
   });
 
   function closeRecord() {
@@ -62,18 +64,23 @@ export function VaccinationSchedule({ canEdit }: { canEdit: boolean }) {
     setAdminDate(new Date().toISOString().slice(0, 10));
   }
 
-  if (isLoading) return <Card className="text-sm text-slate-400">Loading schedule…</Card>;
+  if (isLoading)
+    return (
+      <Card className="text-sm text-slate-400 dark:text-slate-500">
+        {t("vaccination.loading")}
+      </Card>
+    );
 
   if (vaccines.length === 0) {
     return (
-      <Card className="text-center text-slate-400">
+      <Card className="text-center text-slate-400 dark:text-slate-500">
         <SyringeIcon className="mx-auto mb-2 h-8 w-8 text-brand-300" />
         <p className="text-sm">
-          No vaccination schedule yet.
+          {t("vaccination.empty")}
           <br />
           {activeChild?.birth_date
-            ? "Tap below to generate the WHO schedule."
-            : "Add a date of birth to generate the schedule."}
+            ? t("vaccination.tapBelow")
+            : t("vaccination.addDob")}
         </p>
       </Card>
     );
@@ -85,12 +92,14 @@ export function VaccinationSchedule({ canEdit }: { canEdit: boolean }) {
     <div className="space-y-3">
       <Card className="flex items-center justify-between">
         <div>
-          <p className="text-sm font-semibold text-slate-700">Immunization progress</p>
-          <p className="text-xs text-slate-400">
-            {given} of {sorted.length} doses recorded
+          <p className="text-sm font-semibold text-slate-700 dark:text-slate-200">
+            {t("vaccination.progress")}
+          </p>
+          <p className="text-xs text-slate-400 dark:text-slate-500">
+            {t("vaccination.doses", { given, total: sorted.length })}
           </p>
         </div>
-        <div className="h-2 w-28 overflow-hidden rounded-full bg-brand-100">
+        <div className="h-2 w-28 overflow-hidden rounded-full bg-brand-100 dark:bg-slate-700">
           <div
             className="h-full bg-brand-500 transition-all"
             style={{ width: `${sorted.length ? (given / sorted.length) * 100 : 0}%` }}
@@ -107,12 +116,12 @@ export function VaccinationSchedule({ canEdit }: { canEdit: boolean }) {
       <Modal
         open={!!recording}
         onOpenChange={(o) => !o && closeRecord()}
-        title="Record vaccine"
+        title={t("vaccination.record")}
         description={recording?.vaccine_name}
         footer={
           <>
             <Button variant="ghost" onClick={closeRecord}>
-              Cancel
+              {t("common.cancel")}
             </Button>
             <Button
               loading={mark.isPending}
@@ -120,27 +129,28 @@ export function VaccinationSchedule({ canEdit }: { canEdit: boolean }) {
                 recording && mark.mutate({ id: recording.id, date: adminDate, lot })
               }
             >
-              Save
+              {t("common.save")}
             </Button>
           </>
         }
       >
         <div className="space-y-4">
-          <p className="text-sm text-slate-600">
-            Scheduled for{" "}
-            {recording && format(new Date(recording.scheduled_date), "MMM d, yyyy")}.
+          <p className="text-sm text-slate-600 dark:text-slate-300">
+            {t("vaccination.scheduledFor", {
+              date: recording ? fmt(recording.scheduled_date, "MMM d, yyyy") : "",
+            })}
           </p>
           <Input
-            label="Date given"
+            label={t("vaccination.dateGiven")}
             type="date"
             value={adminDate}
             onChange={(e) => setAdminDate(e.target.value)}
           />
           <Input
-            label="Lot number (optional)"
+            label={t("vaccination.lot")}
             value={lot}
             onChange={(e) => setLot(e.target.value)}
-            placeholder="e.g. AB1234"
+            placeholder={t("vaccination.lotPlaceholder")}
           />
         </div>
       </Modal>
@@ -157,11 +167,18 @@ function VaccineRow({
   canEdit: boolean;
   onMark: () => void;
 }) {
+  const { t } = useTranslation();
   const given = !!vaccine.administered_date;
   const today = new Date();
   const daysUntil = differenceInCalendarDays(new Date(vaccine.scheduled_date), today);
   const overdue = !given && daysUntil < 0;
   const dueSoon = !given && daysUntil >= 0 && daysUntil <= 14;
+
+  const statusSuffix = overdue
+    ? ` · ${t("vaccination.overdue")}`
+    : dueSoon
+    ? ` · ${t("vaccination.dueSoon")}`
+    : "";
 
   return (
     <li>
@@ -170,29 +187,38 @@ function VaccineRow({
           className={
             "flex h-10 w-10 shrink-0 items-center justify-center rounded-full " +
             (given
-              ? "bg-mint-soft/60 text-emerald-600"
+              ? "bg-mint-soft/60 text-emerald-600 dark:bg-emerald-500/20 dark:text-emerald-300"
               : overdue
-              ? "bg-rose-50 text-rose-500"
-              : "bg-brand-50 text-brand-400")
+              ? "bg-rose-50 text-rose-500 dark:bg-rose-500/20 dark:text-rose-300"
+              : "bg-brand-50 text-brand-400 dark:bg-brand-900/40 dark:text-brand-300")
           }
         >
           {given ? <CheckIcon className="h-5 w-5" /> : <SyringeIcon className="h-5 w-5" />}
         </div>
         <div className="min-w-0 flex-1">
-          <p className={"text-sm font-semibold " + (given ? "text-slate-400 line-through" : "text-slate-700")}>
+          <p
+            className={
+              "text-sm font-semibold " +
+              (given
+                ? "text-slate-400 line-through dark:text-slate-500"
+                : "text-slate-700 dark:text-slate-200")
+            }
+          >
             {vaccine.vaccine_name}
           </p>
-          <p className="text-xs text-slate-400">
+          <p className="text-xs text-slate-400 dark:text-slate-500">
             {given && vaccine.administered_date
-              ? `Given ${format(new Date(vaccine.administered_date), "MMM d, yyyy")}`
-              : `Due ${format(new Date(vaccine.scheduled_date), "MMM d, yyyy")}${
-                  overdue ? " · overdue" : dueSoon ? " · due soon" : ""
-                }`}
+              ? t("vaccination.given", {
+                  date: fmt(vaccine.administered_date, "MMM d, yyyy"),
+                })
+              : t("vaccination.due", {
+                  date: fmt(vaccine.scheduled_date, "MMM d, yyyy"),
+                }) + statusSuffix}
           </p>
         </div>
         {!given && canEdit && (
           <Button size="sm" variant="secondary" onClick={onMark}>
-            Mark given
+            {t("vaccination.markGiven")}
           </Button>
         )}
       </Card>

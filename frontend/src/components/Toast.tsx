@@ -1,5 +1,6 @@
 import { createContext, useCallback, useContext, useState, type ReactNode } from "react";
 import * as Toast from "@radix-ui/react-toast";
+import { useTranslation } from "react-i18next";
 import { cn } from "../lib/utils";
 
 type ToastVariant = "info" | "success" | "error";
@@ -27,6 +28,7 @@ export function useToast(): ToastApi {
 
 export function ToastProvider({ children }: { children: ReactNode }) {
   const [toasts, setToasts] = useState<ToastRecord[]>([]);
+  const { t: tt } = useTranslation();
 
   const remove = useCallback((id: number) => {
     setToasts((prev) => prev.filter((t) => t.id !== id));
@@ -52,7 +54,7 @@ export function ToastProvider({ children }: { children: ReactNode }) {
             key={t.id}
             onOpenChange={(open) => !open && remove(t.id)}
             className={cn(
-              "pointer-events-auto flex items-start gap-3 rounded-2xl border-l-4 bg-white p-4 shadow-soft",
+              "pointer-events-auto flex items-start gap-3 rounded-2xl border-l-4 bg-white p-4 shadow-soft dark:bg-slate-800",
               "data-[state=open]:animate-in data-[state=open]:slide-in-from-right",
               t.variant === "success" && "border-emerald-400",
               t.variant === "error" && "border-rose-400",
@@ -60,16 +62,16 @@ export function ToastProvider({ children }: { children: ReactNode }) {
             )}
           >
             <div className="min-w-0 flex-1">
-              <Toast.Title className="text-sm font-semibold text-slate-800">{t.title}</Toast.Title>
+              <Toast.Title className="text-sm font-semibold text-slate-800 dark:text-slate-100">{t.title}</Toast.Title>
               {t.description && (
-                <Toast.Description className="mt-0.5 text-sm text-slate-500">
+                <Toast.Description className="mt-0.5 text-sm text-slate-500 dark:text-slate-400">
                   {t.description}
                 </Toast.Description>
               )}
             </div>
             <Toast.Close
-              aria-label="Dismiss"
-              className="rounded p-0.5 text-slate-400 hover:text-slate-600"
+              aria-label={tt("common.dismiss")}
+              className="rounded p-0.5 text-slate-400 hover:text-slate-600 dark:hover:text-slate-200"
             >
               <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
                 <path d="M18 6 6 18M6 6l12 12" strokeLinecap="round" />

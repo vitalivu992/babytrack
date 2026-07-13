@@ -38,7 +38,7 @@ export function Tabs({
       className={cn("w-full", className)}
     >
       <RadixTabs.List
-        className="mb-4 flex w-full gap-1 overflow-x-auto rounded-2xl bg-brand-50 p-1.5"
+        className="mb-4 flex w-full gap-1 overflow-x-auto rounded-2xl bg-brand-50 p-1.5 dark:bg-slate-700/50"
         aria-label="Sections"
       >
         {items.map((item) => (
@@ -46,9 +46,9 @@ export function Tabs({
             key={item.value}
             value={item.value}
             className={cn(
-              "flex flex-1 shrink-0 items-center justify-center gap-1.5 whitespace-nowrap rounded-xl px-3 py-2 text-sm font-semibold text-slate-500 transition",
-              "data-[state=active]:bg-white data-[state=active]:text-brand-700 data-[state=active]:shadow-sm",
-              "hover:text-brand-600",
+              "flex flex-1 shrink-0 items-center justify-center gap-1.5 whitespace-nowrap rounded-xl px-3 py-2 text-sm font-semibold text-slate-500 transition dark:text-slate-400",
+              "data-[state=active]:bg-white data-[state=active]:text-brand-700 data-[state=active]:shadow-sm dark:data-[state=active]:bg-slate-800 dark:data-[state=active]:text-brand-300",
+              "hover:text-brand-600 dark:hover:text-brand-400",
             )}
           >
             {item.icon}
