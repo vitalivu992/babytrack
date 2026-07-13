@@ -25,13 +25,13 @@ func NewChildService(children *repository.ChildRepo, sharing *repository.ChildUs
 
 // CreateInput holds fields for creating a child.
 type CreateInput struct {
-	Name      string     `json:"name"`
-	BirthDate *time.Time `json:"birth_date"`
-	Gender    string     `json:"gender"`
-	PhotoURL  string     `json:"photo_url"`
-	BloodType string     `json:"blood_type"`
-	Allergies string     `json:"allergies"`
-	Notes     string     `json:"notes"`
+	Name      string  `json:"name"`
+	BirthDate *string `json:"birth_date"`
+	Gender    string  `json:"gender"`
+	PhotoURL  string  `json:"photo_url"`
+	BloodType string  `json:"blood_type"`
+	Allergies string  `json:"allergies"`
+	Notes     string  `json:"notes"`
 }
 
 // Create makes a new child owned by ownerID and grants the owner role.
@@ -42,13 +42,19 @@ func (s *ChildService) Create(ctx Ctx, ownerID uuid.UUID, in CreateInput) (*mode
 	}
 	c := &models.Child{
 		Name:      in.Name,
-		BirthDate: in.BirthDate,
 		Gender:    in.Gender,
 		PhotoURL:  in.PhotoURL,
 		BloodType: in.BloodType,
 		Allergies: in.Allergies,
 		Notes:     in.Notes,
 		OwnerID:   ownerID,
+	}
+	if in.BirthDate != nil && *in.BirthDate != "" {
+		t, err := time.Parse("2006-01-02", *in.BirthDate)
+		if err != nil {
+			return nil, fmtw("%w: invalid birth_date format", ErrValidation)
+		}
+		c.BirthDate = &t
 	}
 	if err := s.children.CreateChild(ctx, c); err != nil {
 		return nil, fmt.Errorf("create child: %w", err)
@@ -77,13 +83,13 @@ func (s *ChildService) Get(ctx Ctx, id uuid.UUID) (*models.Child, error) {
 // UpdateInput holds editable child fields. Pointers distinguish "unset" from
 // "clear to empty".
 type UpdateInput struct {
-	Name      *string    `json:"name"`
-	BirthDate *time.Time `json:"birth_date"`
-	Gender    *string    `json:"gender"`
-	PhotoURL  *string    `json:"photo_url"`
-	BloodType *string    `json:"blood_type"`
-	Allergies *string    `json:"allergies"`
-	Notes     *string    `json:"notes"`
+	Name      *string `json:"name"`
+	BirthDate *string `json:"birth_date"`
+	Gender    *string `json:"gender"`
+	PhotoURL  *string `json:"photo_url"`
+	BloodType *string `json:"blood_type"`
+	Allergies *string `json:"allergies"`
+	Notes     *string `json:"notes"`
 }
 
 // Update applies partial changes to a child.
@@ -99,7 +105,15 @@ func (s *ChildService) Update(ctx Ctx, id uuid.UUID, in UpdateInput) (*models.Ch
 		}
 	}
 	if in.BirthDate != nil {
-		c.BirthDate = in.BirthDate
+		if *in.BirthDate == "" {
+			c.BirthDate = nil
+		} else {
+			t, err := time.Parse("2006-01-02", *in.BirthDate)
+			if err != nil {
+				return nil, fmtw("%w: invalid birth_date format", ErrValidation)
+			}
+			c.BirthDate = &t
+		}
 	}
 	if in.Gender != nil {
 		c.Gender = *in.Gender
