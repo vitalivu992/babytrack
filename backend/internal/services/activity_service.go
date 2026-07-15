@@ -68,6 +68,39 @@ func (s *ActivityService) Create(ctx Ctx, childID, userID uuid.UUID, in CreateLo
 	return l, nil
 }
 
+// ActivityUpdateInput holds the fields needed to update an existing log.
+type ActivityUpdateInput struct {
+	Data      json.RawMessage `json:"data"`
+	Timestamp *time.Time      `json:"timestamp"`
+	Note      string          `json:"note"`
+}
+
+// Update modifies an existing activity log.
+func (s *ActivityService) Update(ctx Ctx, id, childID uuid.UUID, in ActivityUpdateInput) (*models.ActivityLog, error) {
+	log, err := s.logs.GetLogByID(ctx, id, childID)
+	if err != nil {
+		return nil, err
+	}
+	if len(in.Data) > 0 {
+		if !json.Valid(in.Data) {
+			return nil, fmtw("%w: data must be valid JSON", ErrValidation)
+		}
+		log.Data = in.Data
+	}
+	if in.Note != "" {
+		log.Note = in.Note
+	} else {
+		log.Note = ""
+	}
+	if in.Timestamp != nil && !in.Timestamp.IsZero() {
+		log.Timestamp = *in.Timestamp
+	}
+	if err := s.logs.UpdateLog(ctx, log); err != nil {
+		return nil, fmt.Errorf("update log: %w", err)
+	}
+	return log, nil
+}
+
 // Query filters logs by type and an optional [from,to] window.
 type Query struct {
 	Type   string

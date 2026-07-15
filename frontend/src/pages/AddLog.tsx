@@ -21,7 +21,7 @@ import {
 } from "../components/icons";
 import { useActiveChild } from "../hooks/useActiveChild";
 
-type TabKey = "feeding" | "diaper" | "sleep" | "measurement" | "medicine" | "other";
+export type TabKey = "feeding" | "diaper" | "sleep" | "measurement" | "medicine" | "other";
 
 function useTabsConfig() {
   const { t } = useTranslation();
@@ -35,7 +35,7 @@ function useTabsConfig() {
   ];
 }
 
-const nowLocalInput = (d = new Date()) => {
+export const nowLocalInput = (d = new Date()) => {
   const off = d.getTimezoneOffset();
   return new Date(d.getTime() - off * 60000).toISOString().slice(0, 16);
 };
@@ -155,7 +155,7 @@ export default function AddLog() {
 }
 
 /** Shared per-tab state container: holds the data payload, note, and validity. */
-function useBuildLog(tab: TabKey) {
+export function useBuildLog(tab: TabKey) {
   const [note, setNote] = useState("");
   const [data, setData] = useState<LogData>({});
 
@@ -172,7 +172,7 @@ function useBuildLog(tab: TabKey) {
   return { note, setNote, data, setData, payload, ready, reset };
 }
 
-function buildPayload(tab: TabKey, data: LogData): { payload: LogData; ready: boolean } {
+export function buildPayload(tab: TabKey, data: LogData): { payload: LogData; ready: boolean } {
   switch (tab) {
     case "feeding": {
       const subtype = (data.subtype as string) || "";
@@ -238,9 +238,9 @@ function buildPayload(tab: TabKey, data: LogData): { payload: LogData; ready: bo
   }
 }
 
-const num = (v: unknown) => (typeof v === "number" ? v : v ? Number(v) : 0);
+export const num = (v: unknown) => (typeof v === "number" ? v : v ? Number(v) : 0);
 
-function defaultUnit(mtype: string): string {
+export function defaultUnit(mtype: string): string {
   switch (mtype) {
     case "weight":
       return "kg";
@@ -255,12 +255,12 @@ function defaultUnit(mtype: string): string {
 
 // --- Per-tab forms ---
 
-interface FormProps {
+export interface FormProps {
   data: LogData;
   setData: Dispatch<SetStateAction<LogData>>;
 }
 
-function FeedingForm({ data, setData }: FormProps) {
+export function FeedingForm({ data, setData }: FormProps) {
   const { t } = useTranslation();
   const subtype = (data.subtype as string) || "";
   return (
@@ -320,7 +320,7 @@ function FeedingForm({ data, setData }: FormProps) {
   );
 }
 
-function DiaperForm({ data, setData }: FormProps) {
+export function DiaperForm({ data, setData }: FormProps) {
   const { t } = useTranslation();
   const contents = (data.contents as string) || "";
   const presets: { value: string; labelKey: string; emoji: string }[] = [
@@ -385,7 +385,7 @@ function DiaperForm({ data, setData }: FormProps) {
   );
 }
 
-function SleepForm({ data, setData }: FormProps) {
+export function SleepForm({ data, setData }: FormProps) {
   const { t } = useTranslation();
   const start = (data.start as string) || "";
   const end = (data.end as string) || "";
@@ -429,7 +429,7 @@ function SleepForm({ data, setData }: FormProps) {
   );
 }
 
-function MeasurementForm({ data, setData }: FormProps) {
+export function MeasurementForm({ data, setData }: FormProps) {
   const { t } = useTranslation();
   const mtype = (data.measurement_type as string) || "";
   return (
@@ -467,7 +467,7 @@ function MeasurementForm({ data, setData }: FormProps) {
   );
 }
 
-function MedicineForm({ data, setData }: FormProps) {
+export function MedicineForm({ data, setData }: FormProps) {
   const { t } = useTranslation();
   return (
     <div className="space-y-4">
@@ -487,7 +487,7 @@ function MedicineForm({ data, setData }: FormProps) {
   );
 }
 
-function OtherForm({ data, setData }: FormProps) {
+export function OtherForm({ data, setData }: FormProps) {
   const { t } = useTranslation();
   return (
     <div className="space-y-4">
@@ -509,7 +509,7 @@ function OtherForm({ data, setData }: FormProps) {
   );
 }
 
-function valueOrEmpty(v: unknown): string {
+export function valueOrEmpty(v: unknown): string {
   if (v === undefined || v === null || v === "") return "";
   return String(v);
 }

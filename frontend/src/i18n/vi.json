@@ -166,6 +166,8 @@
       },
       "reset": "Đặt lại",
       "saveLog": "Lưu bản ghi",
+      "editTitle": "Sửa hoạt động",
+      "updateLog": "Cập nhật",
       "time": "Thời gian",
       "note": "Ghi chú (không bắt buộc)",
       "notePlaceholder": "Điều gì cần nhớ...",
@@ -234,7 +236,10 @@
       "deleteTitle": "Xóa bản ghi?",
       "cannotUndo": "Hành động này không thể hoàn tác.",
       "deletedToast": "Đã xóa bản ghi",
-      "couldNotDelete": "Không thể xóa"
+      "couldNotDelete": "Không thể xóa",
+      "editLog": "Sửa",
+      "updatedToast": "Đã cập nhật bản ghi",
+      "couldNotUpdate": "Không thể cập nhật"
     }
   },
   "child": {

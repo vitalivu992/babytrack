@@ -2,6 +2,7 @@ package repository
 
 import (
 	"context"
+	"errors"
 	"fmt"
 	"time"
 
@@ -113,6 +114,40 @@ func (r *ActivityRepo) DeleteLog(ctx context.Context, id, userID interface{}) er
 	ct, err := r.db.Exec(ctx, q, args...)
 	if err != nil {
 		return fmt.Errorf("delete log: %w", err)
+	}
+	if ct.RowsAffected() == 0 {
+		return ErrNotFound
+	}
+	return nil
+}
+
+// GetLogByID returns a single activity log by its ID (scoped to childID).
+func (r *ActivityRepo) GetLogByID(ctx context.Context, id, childID interface{}) (*models.ActivityLog, error) {
+	const q = `
+		SELECT l.id, l.child_id, l.user_id, l.type, l.data, l.timestamp, l.note,
+		       l.created_at, COALESCE(u.name, u.email) AS logged_by_name
+		FROM activity_logs l
+		LEFT JOIN users u ON u.id = l.user_id
+		WHERE l.id = $1 AND l.child_id = $2`
+	log, err := scanLog(r.db.QueryRow(ctx, q, id, childID))
+	if err != nil {
+		if errors.Is(err, pgx.ErrNoRows) {
+			return nil, ErrNotFound
+		}
+		return nil, fmt.Errorf("get log: %w", err)
+	}
+	return log, nil
+}
+
+// UpdateLog modifies an existing activity log's data, timestamp, and note.
+func (r *ActivityRepo) UpdateLog(ctx context.Context, l *models.ActivityLog) error {
+	const q = `
+		UPDATE activity_logs
+		SET data = $1, timestamp = $2, note = $3
+		WHERE id = $4 AND child_id = $5`
+	ct, err := r.db.Exec(ctx, q, []byte(l.Data), l.Timestamp, l.Note, l.ID, l.ChildID)
+	if err != nil {
+		return fmt.Errorf("update log: %w", err)
 	}
 	if ct.RowsAffected() == 0 {
 		return ErrNotFound

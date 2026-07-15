@@ -2,6 +2,7 @@ import { useMemo, useState } from "react";
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import { isSameDay } from "date-fns";
 import { useTranslation } from "react-i18next";
+import { Link } from "react-router-dom";
 import { deleteLog, listLogs } from "../api/activities";
 import { errorMessage } from "../api/client";
 import type { ActivityLog, LogType } from "../api/types";
@@ -13,7 +14,7 @@ import { Button } from "../components/Button";
 import { Modal } from "../components/Modal";
 import { describeLog, logTypeMeta, sleepMinutes } from "../lib/logs";
 import { fmt, formatDuration } from "../lib/utils";
-import { TrashIcon } from "../components/icons";
+import { EditIcon, TrashIcon } from "../components/icons";
 import i18n from "../i18n";
 
 export default function LogHistory() {
@@ -191,13 +192,22 @@ function LogRow({
           )}
         </div>
         {canEdit && (
-          <button
-            onClick={onDelete}
-            aria-label={t("common.delete")}
-            className="rounded-lg p-2 text-slate-300 transition hover:bg-rose-50 hover:text-rose-500 dark:text-slate-600 dark:hover:bg-rose-500/10 dark:hover:text-rose-400"
-          >
-            <TrashIcon className="h-4 w-4" />
-          </button>
+          <div className="flex items-center gap-1">
+            <Link
+              to={`/app/log/${log.id}/edit`}
+              aria-label={t("common.edit")}
+              className="rounded-lg p-2 text-slate-300 transition hover:bg-brand-50 hover:text-brand-500 dark:text-slate-600 dark:hover:bg-brand-500/10 dark:hover:text-brand-400"
+            >
+              <EditIcon className="h-4 w-4" />
+            </Link>
+            <button
+              onClick={onDelete}
+              aria-label={t("common.delete")}
+              className="rounded-lg p-2 text-slate-300 transition hover:bg-rose-50 hover:text-rose-500 dark:text-slate-600 dark:hover:bg-rose-500/10 dark:hover:text-rose-400"
+            >
+              <TrashIcon className="h-4 w-4" />
+            </button>
+          </div>
         )}
       </Card>
     </li>

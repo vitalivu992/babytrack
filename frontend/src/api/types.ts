@@ -68,6 +68,12 @@ export interface CreateLogInput {
   note?: string;
 }
 
+export interface UpdateLogInput {
+  data: LogData;
+  timestamp?: string;
+  note?: string;
+}
+
 export type MeasurementType = "weight" | "height" | "head_circumference";
 
 export interface Measurement {

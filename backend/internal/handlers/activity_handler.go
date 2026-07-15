@@ -89,6 +89,31 @@ func (h *ActivityHandler) Delete(c *gin.Context) {
 	OK(c, gin.H{"deleted": true})
 }
 
+// Update handles PATCH /api/children/:child_id/logs/:id.
+func (h *ActivityHandler) Update(c *gin.Context) {
+	childID, ok := childID(c)
+	if !ok {
+		Err(c, errBadChildID)
+		return
+	}
+	id, err := parseParamID(c, "id")
+	if err != nil {
+		Err(c, errBadID)
+		return
+	}
+	var in services.ActivityUpdateInput
+	if err := c.ShouldBindJSON(&in); err != nil {
+		c.JSON(http.StatusBadRequest, gin.H{"error": "invalid request body"})
+		return
+	}
+	log, err := h.activity.Update(c.Request.Context(), id, childID, in)
+	if err != nil {
+		Err(c, err)
+		return
+	}
+	OK(c, log)
+}
+
 // atoiDefault parses an int with a fallback.
 func atoiDefault(s string, fallback int) int {
 	n, err := strconv.Atoi(s)

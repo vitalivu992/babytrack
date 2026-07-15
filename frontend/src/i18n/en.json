@@ -166,6 +166,8 @@
       },
       "reset": "Reset",
       "saveLog": "Save log",
+      "editTitle": "Edit activity",
+      "updateLog": "Update",
       "time": "Time",
       "note": "Note (optional)",
       "notePlaceholder": "Anything to remember...",
@@ -234,7 +236,10 @@
       "deleteTitle": "Delete log?",
       "cannotUndo": "This can't be undone.",
       "deletedToast": "Log deleted",
-      "couldNotDelete": "Couldn't delete"
+      "couldNotDelete": "Couldn't delete",
+      "editLog": "Edit",
+      "updatedToast": "Log updated",
+      "couldNotUpdate": "Couldn't update"
     }
   },
   "child": {

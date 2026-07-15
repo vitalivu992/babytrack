@@ -144,6 +144,7 @@ func run() error {
 				edit.PATCH("/measurements/:id", measureH.Update)
 				edit.DELETE("/measurements/:id", measureH.Delete)
 				edit.DELETE("/logs/:id", activityH.Delete)
+			edit.PATCH("/logs/:id", activityH.Update)
 				edit.PATCH("/vaccinations/:id", vaccH.MarkAdministered)
 				edit.DELETE("/vaccinations/:id", vaccH.Delete)
 				edit.POST("/vaccinations/schedule", vaccH.GenerateSchedule)

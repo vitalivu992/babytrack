@@ -13,6 +13,7 @@ import Register from "./pages/Register";
 import Onboarding from "./pages/Onboarding";
 import Dashboard from "./pages/Dashboard";
 import AddLog from "./pages/AddLog";
+import EditLog from "./pages/EditLog";
 import ChildProfile from "./pages/ChildProfile";
 import LogHistory from "./pages/LogHistory";
 import Insights from "./pages/Insights";
@@ -59,6 +60,7 @@ export default function App() {
           <Route path="share" element={<Share />} />
           <Route path="settings" element={<Settings />} />
           <Route path="log/new" element={<AddLog />} />
+          <Route path="log/:logId/edit" element={<EditLog />} />
         </Route>
 
         {/* Fallbacks */}
