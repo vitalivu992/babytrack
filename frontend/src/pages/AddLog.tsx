@@ -3,7 +3,8 @@ import { useNavigate, useSearchParams } from "react-router-dom";
 import { useMutation, useQueryClient } from "@tanstack/react-query";
 import { useTranslation } from "react-i18next";
 import { createLog } from "../api/activities";
-import type { CreateLogInput, LogData, LogType } from "../api/types";
+import { createMeasurement } from "../api/measurements";
+import type { CreateLogInput, LogData, LogType, MeasurementInput } from "../api/types";
 import { errorMessage } from "../api/client";
 import { useToast } from "../components/Toast";
 import { Tabs, TabContent } from "../components/Tabs";
@@ -73,6 +74,24 @@ export default function AddLog() {
     onError: (err) => toast.error(t("dashboard.toast.couldNotSave"), errorMessage(err)),
   });
 
+  // Measurement tab: persist to /children/:id/measurements (the same table the growth chart reads from) instead of activity_logs.
+  // Use a separate mutation so handler logic stays isolated while keeping the same UX (pending/toast/close).
+  const measurementMutation = useMutation({
+    mutationFn: async (input: MeasurementInput) => {
+      if (!activeChild) throw { message: "No child selected" };
+      return createMeasurement(activeChild.id, input);
+    },
+    onSuccess: () => {
+      qc.invalidateQueries({ queryKey: ["logs"] });
+      qc.invalidateQueries({ queryKey: ["daily"] });
+      qc.invalidateQueries({ queryKey: ["weekly"] });
+      qc.invalidateQueries({ queryKey: ["growth", activeChild?.id] });
+      toast.success(t("dashboard.toast.logged"));
+      close();
+    },
+    onError: (err) => toast.error(t("dashboard.toast.couldNotSave"), errorMessage(err)),
+  });
+
   // Keep the URL param in sync with the active tab for shareable state.
   useEffect(() => {
     const next = new URLSearchParams(params);
@@ -85,6 +104,18 @@ export default function AddLog() {
 
   function handleSubmit() {
     if (!ready) return;
+    if (tab === "measurement") {
+      const trimmedNote = note.trim();
+      const input: MeasurementInput = {
+        type: payload.measurement_type as MeasurementInput["type"],
+        value: Number(payload.value),
+        unit: (payload.unit as string) ?? "",
+        measured_at: new Date(stamp).toISOString().slice(0, 10),
+        ...(trimmedNote ? { note: trimmedNote } : {}),
+      };
+      measurementMutation.mutate(input);
+      return;
+    }
     mutation.mutate({
       type: tab as LogType,
       data: payload,
@@ -106,10 +137,14 @@ export default function AddLog() {
       description={activeChild ? activeChild.name : undefined}
       footer={
         <>
-          <Button variant="ghost" onClick={handleReset} disabled={mutation.isPending}>
+          <Button variant="ghost" onClick={handleReset} disabled={mutation.isPending || measurementMutation.isPending}>
             {t("logs.add.reset")}
           </Button>
-          <Button onClick={handleSubmit} loading={mutation.isPending} disabled={!ready}>
+          <Button
+            onClick={handleSubmit}
+            loading={mutation.isPending || measurementMutation.isPending}
+            disabled={!ready}
+          >
             {t("logs.add.saveLog")}
           </Button>
         </>

@@ -28,7 +28,7 @@ RUN cd backend && go build -trimpath -ldflags="-s -w" -o /out/babytrack ./cmd/se
 FROM alpine:3.20 AS runtime
 RUN apk add --no-cache wget ca-certificates tzdata && \
     adduser -D -u 65532 app
-ENV PORT=8080 ENV=production
+ENV PORT=8080 ENV=production TZ=Asia/Ho_Chi_Minh
 WORKDIR /
 COPY --from=backend /out/babytrack /babytrack
 EXPOSE 8080
