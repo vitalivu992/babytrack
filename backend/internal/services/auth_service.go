@@ -3,6 +3,7 @@ package services
 import (
 	"errors"
 	"fmt"
+	"log"
 	"strings"
 	"time"
 
@@ -11,6 +12,7 @@ import (
 	"golang.org/x/crypto/bcrypt"
 
 	"github.com/vitalivu992/babytrack/internal/config"
+	"github.com/vitalivu992/babytrack/internal/email"
 	"github.com/vitalivu992/babytrack/internal/models"
 	"github.com/vitalivu992/babytrack/internal/repository"
 )
@@ -18,12 +20,13 @@ import (
 // AuthService owns authentication: registration, login, JWT issuing.
 type AuthService struct {
 	users *repository.UserRepo
+	email *email.Client
 	cost  int
 }
 
 // NewAuthService constructs an AuthService.
-func NewAuthService(users *repository.UserRepo) *AuthService {
-	return &AuthService{users: users, cost: config.BcryptCost}
+func NewAuthService(users *repository.UserRepo, emailClient *email.Client) *AuthService {
+	return &AuthService{users: users, email: emailClient, cost: config.BcryptCost}
 }
 
 // RegisterInput holds the fields needed to create an account.
@@ -53,6 +56,18 @@ func (s *AuthService) Register(ctx Ctx, in RegisterInput) (*models.User, error) 
 		}
 		return nil, fmt.Errorf("create user: %w", err)
 	}
+
+	// Send welcome email (fire-and-forget, don't block registration)
+	if s.email != nil {
+		go func() {
+			textBody := fmt.Sprintf("Hi %s,\n\nWelcome to BabyTrack! Your account has been created successfully.\n\nStart tracking your baby's activities, growth, and milestones.\n\nBest regards,\nBabyTrack Team", in.Name)
+			htmlBody := fmt.Sprintf("<h2>Welcome to BabyTrack, %s!</h2><p>Your account has been created successfully.</p><p>Start tracking your baby's activities, growth, and milestones.</p><p>Best regards,<br>BabyTrack Team</p>", in.Name)
+			if err := s.email.Send(in.Email, in.Name, "Welcome to BabyTrack!", textBody, htmlBody); err != nil {
+				log.Printf("failed to send welcome email to %s: %v", in.Email, err)
+			}
+		}()
+	}
+
 	return u, nil
 }
 

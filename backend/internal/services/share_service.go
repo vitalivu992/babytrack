@@ -3,11 +3,13 @@ package services
 import (
 	"errors"
 	"fmt"
+	"log"
 	"strings"
 	"time"
 
 	"github.com/google/uuid"
 
+	"github.com/vitalivu992/babytrack/internal/email"
 	"github.com/vitalivu992/babytrack/internal/models"
 	"github.com/vitalivu992/babytrack/internal/repository"
 )
@@ -17,11 +19,12 @@ type ShareService struct {
 	invitations *repository.InvitationRepo
 	sharing     *repository.ChildUserRepo
 	users       *repository.UserRepo
+	email       *email.Client
 }
 
 // NewShareService constructs a ShareService.
-func NewShareService(invitations *repository.InvitationRepo, sharing *repository.ChildUserRepo, users *repository.UserRepo) *ShareService {
-	return &ShareService{invitations: invitations, sharing: sharing, users: users}
+func NewShareService(invitations *repository.InvitationRepo, sharing *repository.ChildUserRepo, users *repository.UserRepo, emailClient *email.Client) *ShareService {
+	return &ShareService{invitations: invitations, sharing: sharing, users: users, email: emailClient}
 }
 
 // InviteInput holds the fields for creating an invitation.
@@ -50,6 +53,18 @@ func (s *ShareService) Invite(ctx Ctx, childID uuid.UUID, in InviteInput) (*mode
 	if err := s.invitations.Create(ctx, inv); err != nil {
 		return nil, fmt.Errorf("create invitation: %w", err)
 	}
+
+	// Send invitation email (fire-and-forget)
+	if s.email != nil {
+		go func() {
+			textBody := fmt.Sprintf("You've been invited to share a child's activity tracker on BabyTrack.\n\nUse this link to accept the invitation:\nhttps://babytrack.linhvu.net/invite/%s\n\nThis invitation expires in 7 days.\n\nBabyTrack Team", inv.Token)
+			htmlBody := fmt.Sprintf("<h2>You're Invited!</h2><p>You've been invited to share a child's activity tracker on BabyTrack.</p><p><a href=\"https://babytrack.linhvu.net/invite/%s\">Click here to accept the invitation</a></p><p>This invitation expires in 7 days.</p><p>Best regards,<br>BabyTrack Team</p>", inv.Token)
+			if err := s.email.Send(in.Email, "", "You're invited to BabyTrack!", textBody, htmlBody); err != nil {
+				log.Printf("failed to send invitation email to %s: %v", in.Email, err)
+			}
+		}()
+	}
+
 	return inv, nil
 }
 

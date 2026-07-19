@@ -16,6 +16,7 @@ import (
 	"github.com/gin-gonic/gin"
 
 	"github.com/vitalivu992/babytrack/internal/config"
+	"github.com/vitalivu992/babytrack/internal/email"
 	"github.com/vitalivu992/babytrack/internal/frontend"
 	"github.com/vitalivu992/babytrack/internal/handlers"
 	"github.com/vitalivu992/babytrack/internal/middleware"
@@ -67,12 +68,15 @@ func run() error {
 	reminderRepo := repository.NewReminderRepo(pool)
 	invRepo := repository.NewInvitationRepo(pool)
 
+	// --- email client (simple-email-service) ---
+	emailClient := email.New()
+
 	// --- services ---
-	authSvc := services.NewAuthService(userRepo)
+	authSvc := services.NewAuthService(userRepo, emailClient)
 	childSvc := services.NewChildService(childRepo, childUserRepo)
 	activitySvc := services.NewActivityService(activityRepo)
 	insightsSvc := services.NewInsightsService(activityRepo, measureRepo)
-	shareSvc := services.NewShareService(invRepo, childUserRepo, userRepo)
+	shareSvc := services.NewShareService(invRepo, childUserRepo, userRepo, emailClient)
 	vaccSvc := services.NewVaccinationService(vaccRepo, childRepo)
 
 	// --- handlers ---
